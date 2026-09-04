@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wine Quality Classifier | Machine Learning Enology Lab</title>
+  <meta name="description" content="Predict wine quality from 11 chemical properties (pH, alcohol, acidity, sulfur dioxide) using machine learning. Based on Cortez et al. UCI dataset." />
+
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js for Radar Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Section -->
+    <header class="app-header">
+      <div class="badge-pill">
+        <span>🍷</span> Machine Learning Enology Engine
+      </div>
+      <h1 class="header-title">Wine Quality Classifier</h1>
+      <p class="header-subtitle">
+        Leverage 11 physicochemical properties to evaluate wine balance, detect defects, 
+        and categorize vintages as <strong>Good</strong> or <strong>Defective</strong> in real-time.
+      </p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" id="tabLab">
+        <span>🧪</span> Interactive Lab
+      </button>
+      <button class="tab-btn" id="tabBatch">
+        <span>📁</span> Batch CSV Analysis
+      </button>
+      <button class="tab-btn" id="tabGuide">
+        <span>📖</span> Science & Chemistry Guide
+      </button>
+    </nav>
+
+    <!-- SECTION 1: INTERACTIVE LAB -->
+    <div id="labSection" class="main-grid">
+      
+      <!-- LEFT COLUMN: Chemical Properties Input -->
+      <div>
+        <!-- Control Bar: Wine Type & Presets -->
+        <div class="glass-panel control-bar">
+          <div>
+            <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 0.5rem; font-weight: 600;">VARIETAL:</span>
+            <div class="segmented-control">
+              <button class="segmented-btn active" id="wineTypeRed">
+                <span>🔴</span> Red Wine
+              </button>
+              <button class="segmented-btn" id="wineTypeWhite">
+                <span>⚪</span> White Wine
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <label for="presetSelector" style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">PRESET:</label>
+            <select id="presetSelector" class="preset-select">
+              <option value="red-bordeaux">Grand Cru Reserve Cabernet (Good)</option>
+              <option value="red-spoiled">Vinegar-Spoiled Table Red (Bad)</option>
+              <option value="white-sauvignon">Marlborough Sauvignon Blanc (Good)</option>
+              <option value="white-oxidized">Oxidized Bulk White (Bad)</option>
+              <option value="table-average">Everyday Table Wine (Borderline)</option>
+            </select>
+            <button id="resetDefaultsBtn" class="btn btn-outline" style="padding: 0.45rem 0.8rem; font-size: 0.8rem;" title="Reset Sliders">
+              ↺ Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Sliders Container (Populated dynamically by app.js) -->
+        <div id="slidersContainer"></div>
+      </div>
+
+      <!-- RIGHT COLUMN: Real-Time Results & Diagnostics -->
+      <div>
+        <div class="glass-panel prediction-panel">
+          
+          <!-- Quality Verdict Card -->
+          <div id="resultCard" class="result-card is-good">
+            <span id="verdictBadge" class="verdict-badge good">GOOD QUALITY</span>
+
+            <!-- Animated SVG Probability Gauge -->
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" width="170" height="170" viewBox="0 0 170 170">
+                <circle class="gauge-bg" cx="85" cy="85" r="70" />
+                <circle id="gaugeFillCircle" class="gauge-fill" cx="85" cy="85" r="70" />
+              </svg>
+              <div class="gauge-center-text">
+                <div id="gaugeScoreText" class="gauge-score">88%</div>
+                <div class="gauge-label">Quality Index</div>
+              </div>
+            </div>
+
+            <!-- Sommelier Tasting Notes -->
+            <div id="sommelierNoteBox" class="sommelier-notes">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Radar Chart: Chemical Fingerprint -->
+          <div class="glass-panel chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title">
+                <span>🕸️</span> Chemical Fingerprint vs. Good Wine Benchmark
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="radarCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Top Driving Factors Breakdown -->
+          <div class="glass-panel" style="padding: 1.25rem 1.5rem;">
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px;">
+              ⚡ Key Influencing Factors
+            </div>
+            <div id="impactFactorsList" class="impact-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 2: BATCH CSV ANALYSIS -->
+    <div id="batchSection" class="batch-section">
+      <div class="glass-panel" style="padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">Batch Wine Quality Predictor</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Upload a CSV of physicochemical wine samples to classify the entire batch simultaneously.
+            </p>
+          </div>
+          <a href="sample_wines.csv" download="sample_wines.csv" class="btn btn-outline" style="font-size: 0.85rem;">
+            📥 Download Sample CSV
+          </a>
+        </div>
+
+        <!-- Drag & Drop Zone -->
+        <div id="dropZone" class="drop-zone">
+          <div class="drop-icon">📊</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Drag and drop your wine CSV here</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+            or click to browse from your device (.csv format)
+          </p>
+          <input type="file" id="batchFileInput" accept=".csv" style="display: none;" />
+          <button class="btn btn-primary" onclick="document.getElementById('batchFileInput').click()">
+            Select CSV File
+          </button>
+        </div>
+
+        <!-- Batch Results Card -->
+        <div id="batchResultsCard" style="display: none; margin-top: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+            <div id="batchSummaryText" style="font-size: 0.95rem;"></div>
+            <button id="downloadResultsBtn" class="btn btn-gold">
+              💾 Export Classified CSV
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="batch-table">
+              <thead>
+                <tr>
+                  <th>Wine Label</th>
+                  <th>Alcohol</th>
+                  <th>Volatile Acidity</th>
+                  <th>pH</th>
+                  <th>Verdict</th>
+                  <th>Good Probability</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody id="batchTableBody">
+                <!-- Populated via batch.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODAL: SCIENCE & CHEMISTRY GUIDE -->
+    <div id="guideModal" class="modal-overlay">
+      <div class="glass-panel modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 1rem;">
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--accent-gold);">
+            🔬 The Enological Chemistry Behind Wine Quality
+          </h2>
+          <button id="closeGuideModal" style="background: transparent; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;">
+            &times;
+          </button>
+        </div>
+
+        <div style="font-size: 0.92rem; color: #c9d1d9; display: flex; flex-direction: column; gap: 1.2rem;">
+          <p>
+            Wine evaluation combines subjective sensory perception with objective chemical compounds. 
+            Based on research by <em>Cortez et al., 2009</em> at the University of Minho, the dataset models 
+            the relationship between 11 physicochemical measurements and expert sensory ratings:
+          </p>
+
+          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid var(--accent-gold); padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
+            <h4 style="color: #fff; margin-bottom: 0.2rem;">1. Volatile Acidity (Acetic Acid - Spoilage Indicator)</h4>
+            <p>
+              Acetic acid creates vinegar odor and acrid taste. High volatile acidity (&gt;0.65 g/dm³ in reds, &gt;0.45 g/dm³ in whites) 
+              is the single most direct chemical defect signaling bacterial spoilage (<em>Acetobacter</em>).
+            </p>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid #3fb950; padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
+            <h4 style="color: #fff; margin-bottom: 0.2rem;">2. Alcohol &amp; Density (Body and Structure)</h4>
+            <p>
+              Higher natural alcohol percentages (11.5% - 13.5% vol) strongly correlate with premium vintages, 
+              providing body, flavor extraction, and perceived sweet warmth that balances tannins.
+            </p>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid #e2c077; padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
+            <h4 style="color: #fff; margin-bottom: 0.2rem;">3. Sulphates &amp; Sulfur Dioxide (Preservation Stability)</h4>
+            <p>
+              Potassium sulphate (K₂SO₄) acts as an antioxidant and antimicrobial stabilizer. 
+              Adequate free SO₂ prevents premature oxidation (browning and sherry-like off-flavors), 
+              while excessive total SO₂ yields unpleasant burnt-match aromas.
+            </p>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid #58a6ff; padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
+            <h4 style="color: #fff; margin-bottom: 0.2rem;">4. Fixed Acidity, Citric Acid &amp; pH (Crispness &amp; Equilibrium)</h4>
+            <p>
+              Fixed acids (principally tartaric and malic) maintain proper pH (ideally 3.0 to 3.6). 
+              Citric acid imparts palate freshness. When pH climbs above 3.7, wines feel flat, flabby, and vulnerable to spoilage.
+            </p>
+          </div>
+        </div>
+
+        <div style="text-align: right; margin-top: 1.5rem;">
+          <button class="btn btn-primary" onclick="document.getElementById('guideModal').classList.remove('active')">
+            Close Chemistry Guide
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="app-footer">
+      <p style="margin-bottom: 0.5rem;">
+        Wine Quality Classifier &bull; Built with Machine Learning, HTML5, CSS3, and Vanilla JavaScript.
+      </p>
+      <p style="font-size: 0.78rem;">
+        Dataset: P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. <em>Modeling wine preferences by data mining from physicochemical properties</em>, Decision Support Systems, Elsevier, 47(4):547-553, 2009.
+      </p>
+      <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 1.5rem;">
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub Repository</a>
+        <a href="sample_wines.csv" download>Sample Dataset CSV</a>
+        <a href="LICENSE">MIT License</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/model.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/batch.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
