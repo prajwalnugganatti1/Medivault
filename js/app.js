@@ -1,301 +1,369 @@
 /**
- * Wine Quality Classifier - Main Application Logic
+ * MediVault - Main Application Orchestrator
+ * Navigation, Multi-Role Authentication, Admin Console, AI Chat, Notifications, and Toast System
  */
 
-window.currentWineType = "red";
+const MediVaultApp = {
+  currentView: 'patient-dashboard',
+  currentRole: 'patient', // 'patient', 'doctor', 'admin'
 
-const PROPERTY_GROUPS = [
-  {
-    title: "1. Acidity & pH Balance",
-    icon: "🧪",
-    keys: ["fixed_acidity", "volatile_acidity", "citric_acid", "pH"]
+  init() {
+    console.log('MediVault Orchestrator Initializing...');
+
+    // Initialize sub-controllers
+    if (window.AuthController) window.AuthController.init();
+    if (window.PatientController) window.PatientController.init();
+    if (window.DoctorController) window.DoctorController.init();
+    if (window.PrescriptionEngine) window.PrescriptionEngine.init();
+    if (window.AdminController) window.AdminController.init();
+    if (window.AIChatController) window.AIChatController.init();
+
+    // Check user session
+    const currentUser = window.mediStore.getCurrentUser();
+    if (!currentUser) {
+      this.showAuthScreen();
+    } else {
+      this.completeLogin(currentUser);
+    }
+
+    this.setupEventListeners();
+    this.renderNotifications();
+
+    if (window.lucide) window.lucide.createIcons();
+    console.log('MediVault Ready.');
   },
-  {
-    title: "2. Alcohol & Body Structure",
-    icon: "🍇",
-    keys: ["alcohol", "residual_sugar", "density"]
-  },
-  {
-    title: "3. Preservation & Minerals",
-    icon: "🛡️",
-    keys: ["sulphates", "chlorides", "free_sulfur_dioxide", "total_sulfur_dioxide"]
-  }
-];
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderSliders();
-  setupEventListeners();
-  loadPreset("red-bordeaux");
-  initBatchUpload();
-});
-
-/**
- * Dynamically render the 11 slider input cards
- */
-function renderSliders() {
-  const container = document.getElementById("slidersContainer");
-  if (!container) return;
-  container.innerHTML = "";
-
-  PROPERTY_GROUPS.forEach(group => {
-    const groupDiv = document.createElement("div");
-    groupDiv.className = "property-group";
-
-    const titleEl = document.createElement("h3");
-    titleEl.className = "group-title";
-    titleEl.innerHTML = `<span>${group.icon}</span> ${group.title}`;
-    groupDiv.appendChild(titleEl);
-
-    group.keys.forEach(key => {
-      const cfg = WINE_MODELS.features[key];
-      const defaultVal = window.currentWineType === "red" ? cfg.defaultRed : cfg.defaultWhite;
-
-      const card = document.createElement("div");
-      card.className = "slider-card";
-      card.innerHTML = `
-        <div class="slider-header">
-          <label class="slider-label" for="slider-${key}">
-            ${cfg.label}
-            <span class="info-icon" title="${cfg.desc}">?</span>
-          </label>
-          <div class="slider-value-box">
-            <input type="number" 
-                   id="num-${key}" 
-                   class="slider-input-num" 
-                   min="${cfg.min}" 
-                   max="${cfg.max}" 
-                   step="${cfg.step}" 
-                   value="${defaultVal}" />
-            <span class="slider-unit">${cfg.unit.split(' ')[0]}</span>
-          </div>
-        </div>
-        <input type="range" 
-               id="slider-${key}" 
-               class="custom-range" 
-               min="${cfg.min}" 
-               max="${cfg.max}" 
-               step="${cfg.step}" 
-               value="${defaultVal}" />
-        <div class="slider-footer">
-          <span>Min: ${cfg.min}</span>
-          <span style="color: #c9d1d9;">${cfg.desc.slice(0, 38)}...</span>
-          <span>Max: ${cfg.max}</span>
-        </div>
-      `;
-
-      // Event listeners for two-way binding
-      const rangeInput = card.querySelector(`#slider-${key}`);
-      const numberInput = card.querySelector(`#num-${key}`);
-
-      rangeInput.addEventListener("input", (e) => {
-        numberInput.value = e.target.value;
-        onValuesChanged();
-      });
-
-      numberInput.addEventListener("input", (e) => {
-        let val = parseFloat(e.target.value);
-        if (!isNaN(val)) {
-          rangeInput.value = val;
-          onValuesChanged();
+  setupEventListeners() {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeAllModals();
+        if (window.AIChatController && window.AIChatController.isOpen) {
+          window.AIChatController.toggleChat();
         }
-      });
-
-      groupDiv.appendChild(card);
-    });
-
-    container.appendChild(groupDiv);
-  });
-}
-
-/**
- * Setup Tab Switches, Wine Type Toggle, Presets, and Modal
- */
-function setupEventListeners() {
-  // Wine Type Switcher (Red vs White)
-  const redBtn = document.getElementById("wineTypeRed");
-  const whiteBtn = document.getElementById("wineTypeWhite");
-
-  if (redBtn && whiteBtn) {
-    redBtn.addEventListener("click", () => {
-      window.currentWineType = "red";
-      redBtn.classList.add("active");
-      whiteBtn.classList.remove("active");
-      updateSliderDefaults();
-      onValuesChanged();
-    });
-
-    whiteBtn.addEventListener("click", () => {
-      window.currentWineType = "white";
-      whiteBtn.classList.add("active");
-      redBtn.classList.remove("active");
-      updateSliderDefaults();
-      onValuesChanged();
-    });
-  }
-
-  // Presets Selector
-  const presetSelect = document.getElementById("presetSelector");
-  if (presetSelect) {
-    presetSelect.addEventListener("change", (e) => {
-      if (e.target.value) {
-        loadPreset(e.target.value);
       }
     });
-  }
 
-  // Navigation Tabs
-  const tabLab = document.getElementById("tabLab");
-  const tabBatch = document.getElementById("tabBatch");
-  const tabGuide = document.getElementById("tabGuide");
-  const labSection = document.getElementById("labSection");
-  const batchSection = document.getElementById("batchSection");
-  const guideModal = document.getElementById("guideModal");
-  const closeGuideModal = document.getElementById("closeGuideModal");
-
-  if (tabLab && tabBatch) {
-    tabLab.addEventListener("click", () => {
-      tabLab.classList.add("active");
-      tabBatch.classList.remove("active");
-      labSection.style.display = "grid";
-      batchSection.classList.remove("active");
-    });
-
-    tabBatch.addEventListener("click", () => {
-      tabBatch.classList.add("active");
-      tabLab.classList.remove("active");
-      labSection.style.display = "none";
-      batchSection.classList.add("active");
-    });
-  }
-
-  if (tabGuide && guideModal) {
-    tabGuide.addEventListener("click", () => {
-      guideModal.classList.add("active");
-    });
-    closeGuideModal.addEventListener("click", () => {
-      guideModal.classList.remove("active");
-    });
-    guideModal.addEventListener("click", (e) => {
-      if (e.target === guideModal) {
-        guideModal.classList.remove("active");
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('notifications-dropdown');
+      const btn = document.getElementById('notif-bell-btn');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+          dropdown.classList.add('hidden');
+        }
       }
     });
-  }
+  },
 
-  // Reset Button
-  const resetBtn = document.getElementById("resetDefaultsBtn");
-  if (resetBtn) {
-    resetBtn.addEventListener("click", () => {
-      loadPreset(window.currentWineType === "red" ? "red-bordeaux" : "white-sauvignon");
+  // ----------------------------------------------------
+  // Authentication & Session Management
+  // ----------------------------------------------------
+  showAuthScreen() {
+    const authScreen = document.getElementById('auth-screen-container');
+    const mainApp = document.getElementById('main-app-container');
+    if (authScreen) authScreen.classList.remove('hidden');
+    if (mainApp) mainApp.classList.add('hidden');
+
+    if (window.AuthController) window.AuthController.renderAuthPortal();
+  },
+
+  completeLogin(user) {
+    const authScreen = document.getElementById('auth-screen-container');
+    const mainApp = document.getElementById('main-app-container');
+    if (authScreen) authScreen.classList.add('hidden');
+    if (mainApp) mainApp.classList.remove('hidden');
+
+    this.currentRole = user.role;
+    this.applyRole(user.role);
+
+    // Update Header demographics
+    const headerName = document.getElementById('header-user-name');
+    const headerSub = document.getElementById('header-user-sub');
+    const headerAvatar = document.getElementById('header-avatar');
+
+    if (headerName) headerName.innerText = user.name;
+    if (headerSub) {
+      if (user.role === 'patient') headerSub.innerText = `ID: ${user.id || 'MV-88219'}`;
+      else if (user.role === 'doctor') headerSub.innerText = `${user.hospital || 'Hospital Care'}`;
+      else headerSub.innerText = 'Platform Master Control';
+    }
+
+    if (headerAvatar) {
+      if (user.role === 'doctor') {
+        headerAvatar.src = 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=100&q=80';
+      } else if (user.role === 'admin') {
+        headerAvatar.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';
+      } else {
+        headerAvatar.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80';
+      }
+    }
+
+    // Refresh sub controllers
+    if (user.role === 'patient' && window.PatientController) window.PatientController.init();
+    if (user.role === 'doctor' && window.DoctorController) window.DoctorController.init();
+    if (user.role === 'admin' && window.AdminController) window.AdminController.init();
+
+    if (window.lucide) window.lucide.createIcons();
+  },
+
+  logout() {
+    window.mediStore.logout();
+    this.showToast('You have been logged out of MediVault.', 'info');
+    this.showAuthScreen();
+  },
+
+  // ----------------------------------------------------
+  // Role Switching & Views
+  // ----------------------------------------------------
+  switchRole(role) {
+    this.currentRole = role;
+    this.applyRole(role);
+    this.showToast(`Switched active portal to ${role.toUpperCase()}`, 'info');
+  },
+
+  applyRole(role) {
+    const patientNav = document.getElementById('nav-patient');
+    const doctorNav = document.getElementById('nav-doctor');
+    const adminNav = document.getElementById('nav-admin');
+
+    const patientContainer = document.getElementById('patient-views-container');
+    const doctorContainer = document.getElementById('doctor-views-container');
+    const adminContainer = document.getElementById('admin-views-container');
+
+    const roleBadge = document.getElementById('role-badge');
+
+    // Hide all view containers
+    if (patientContainer) patientContainer.classList.add('hidden');
+    if (doctorContainer) doctorContainer.classList.add('hidden');
+    if (adminContainer) adminContainer.classList.add('hidden');
+
+    // Hide all navbars
+    if (patientNav) patientNav.classList.add('hidden');
+    if (doctorNav) doctorNav.classList.add('hidden');
+    if (adminNav) adminNav.classList.add('hidden');
+
+    if (role === 'patient') {
+      if (patientNav) patientNav.classList.remove('hidden');
+      if (patientContainer) patientContainer.classList.remove('hidden');
+      if (roleBadge) {
+        roleBadge.innerText = 'Patient Portal';
+        roleBadge.className = 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-teal-50 text-teal-700 border border-teal-200';
+      }
+      this.navigateTo('patient-dashboard');
+    } else if (role === 'doctor') {
+      if (doctorNav) doctorNav.classList.remove('hidden');
+      if (doctorContainer) doctorContainer.classList.remove('hidden');
+      if (roleBadge) {
+        roleBadge.innerText = 'Doctor Portal (Verified)';
+        roleBadge.className = 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-cyan-50 text-cyan-700 border border-cyan-200';
+      }
+      this.navigateTo('doctor-dashboard');
+    } else if (role === 'admin') {
+      if (adminNav) adminNav.classList.remove('hidden');
+      if (adminContainer) adminContainer.classList.remove('hidden');
+      if (roleBadge) {
+        roleBadge.innerText = 'Admin Console';
+        roleBadge.className = 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-purple-50 text-purple-700 border border-purple-200';
+      }
+      if (window.AdminController) window.AdminController.init();
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  },
+
+  // ----------------------------------------------------
+  // Navigation / View Switching
+  // ----------------------------------------------------
+  navigateTo(viewId) {
+    this.currentView = viewId;
+
+    // Patient Views
+    const pViews = ['patient-dashboard', 'patient-records', 'patient-prescriptions', 'patient-access', 'patient-profile', 'patient-timeline'];
+    pViews.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      const navBtn = document.getElementById(`nav-link-${v}`);
+      if (el) {
+        if (v === viewId) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      }
+      if (navBtn) {
+        if (v === viewId) {
+          navBtn.classList.add('bg-teal-600', 'text-white', 'shadow-sm');
+          navBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+        } else {
+          navBtn.classList.remove('bg-teal-600', 'text-white', 'shadow-sm');
+          navBtn.classList.add('text-slate-600', 'hover:bg-slate-100');
+        }
+      }
     });
-  }
-}
 
-/**
- * Load Preset values
- */
-function loadPreset(presetKey) {
-  const preset = WINE_MODELS.presets[presetKey];
-  if (!preset) return;
+    // Doctor Views
+    const dViews = ['doctor-dashboard'];
+    dViews.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      const navBtn = document.getElementById(`nav-link-${v}`);
+      if (el) {
+        if (v === viewId) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      }
+      if (navBtn) {
+        if (v === viewId) {
+          navBtn.classList.add('bg-cyan-600', 'text-white', 'shadow-sm');
+          navBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+        } else {
+          navBtn.classList.remove('bg-cyan-600', 'text-white', 'shadow-sm');
+          navBtn.classList.add('text-slate-600', 'hover:bg-slate-100');
+        }
+      }
+    });
 
-  // Set wine type
-  if (preset.wineType !== window.currentWineType) {
-    window.currentWineType = preset.wineType;
-    document.getElementById("wineTypeRed").classList.toggle("active", preset.wineType === "red");
-    document.getElementById("wineTypeWhite").classList.toggle("active", preset.wineType === "white");
-  }
+    if (viewId === 'patient-dashboard' && window.PatientController) window.PatientController.renderDashboard();
+    if (viewId === 'patient-records' && window.PatientController) window.PatientController.renderRecords();
+    if (viewId === 'patient-access' && window.PatientController) window.PatientController.renderAccessHistory();
+    if (viewId === 'patient-timeline' && window.PatientController) window.PatientController.renderTimeline();
+    if (viewId === 'doctor-dashboard' && window.DoctorController) window.DoctorController.renderDashboard();
 
-  // Apply values
-  for (const [key, val] of Object.entries(preset.values)) {
-    const range = document.getElementById(`slider-${key}`);
-    const num = document.getElementById(`num-${key}`);
-    if (range && num) {
-      range.value = val;
-      num.value = val;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.lucide) window.lucide.createIcons();
+  },
+
+  switchDoctorSubView(subViewId) {
+    const dashboardSubView = document.getElementById('doc-dashboard-view');
+    const patientChartSubView = document.getElementById('doc-patient-view');
+
+    if (subViewId === 'doc-dashboard-view') {
+      if (dashboardSubView) dashboardSubView.classList.remove('hidden');
+      if (patientChartSubView) patientChartSubView.classList.add('hidden');
+    } else {
+      if (dashboardSubView) dashboardSubView.classList.add('hidden');
+      if (patientChartSubView) patientChartSubView.classList.remove('hidden');
     }
-  }
+  },
 
-  const selector = document.getElementById("presetSelector");
-  if (selector) selector.value = presetKey;
-
-  onValuesChanged();
-}
-
-/**
- * Update slider defaults when wine type changes without a preset
- */
-function updateSliderDefaults() {
-  Object.keys(WINE_MODELS.features).forEach(key => {
-    const cfg = WINE_MODELS.features[key];
-    const def = window.currentWineType === "red" ? cfg.defaultRed : cfg.defaultWhite;
-    const range = document.getElementById(`slider-${key}`);
-    const num = document.getElementById(`num-${key}`);
-    if (range && num) {
-      range.value = def;
-      num.value = def;
+  // ----------------------------------------------------
+  // Notifications
+  // ----------------------------------------------------
+  toggleNotifications() {
+    const dropdown = document.getElementById('notifications-dropdown');
+    if (dropdown) {
+      dropdown.classList.toggle('hidden');
+      if (!dropdown.classList.contains('hidden')) {
+        this.renderNotifications();
+      }
     }
-  });
-}
+  },
 
-/**
- * Collect current inputs from sliders
- */
-function getCurrentInputs() {
-  const values = {};
-  Object.keys(WINE_MODELS.features).forEach(key => {
-    const num = document.getElementById(`num-${key}`);
-    values[key] = num ? parseFloat(num.value) : 0;
-  });
-  return values;
-}
+  renderNotifications() {
+    const notifs = window.mediStore.getNotifications();
+    const container = document.getElementById('notifications-list');
+    const badge = document.getElementById('notif-unread-badge');
 
-/**
- * Trigger classification & update all UI components
- */
-function onValuesChanged() {
-  const inputs = getCurrentInputs();
-  const result = classifyWine(inputs, window.currentWineType);
+    const unreadCount = notifs.filter(n => !n.read).length;
+    if (badge) {
+      if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
 
-  // 1. Update Gauge & Verdict Badge
-  updateGaugeMeter(result.probability, result.isGood);
+    if (!container) return;
 
-  // 2. Update Sommelier Tasting Note Box
-  const sommelierBox = document.getElementById("sommelierNoteBox");
-  if (sommelierBox) {
-    sommelierBox.innerHTML = `
-      <div class="sommelier-notes-title">
-        <span>🍷</span> Sommelier Sensory Critique (${result.tastingNotes.verdict})
-      </div>
-      <p style="font-weight: 600; color: ${result.isGood ? '#3fb950' : '#f85149'}; margin-bottom: 0.3rem;">
-        ${result.tastingNotes.headline}
-      </p>
-      <p>${result.tastingNotes.summary}</p>
-    `;
-  }
+    if (notifs.length === 0) {
+      container.innerHTML = `<p class="p-4 text-center text-xs text-slate-400">No new notifications</p>`;
+      return;
+    }
 
-  // 3. Update Radar Chart
-  updateRadarChart(inputs, window.currentWineType, result.isGood);
-
-  // 4. Update Top Factor Influences List
-  const impactList = document.getElementById("impactFactorsList");
-  if (impactList) {
-    impactList.innerHTML = "";
-    result.topFactors.forEach(factor => {
-      const item = document.createElement("div");
-      item.className = "impact-item";
-      const badgeClass = factor.isPositive ? "impact-badge-pos" : "impact-badge-neg";
-      const sign = factor.isPositive ? "+" : "";
-      const directionDesc = factor.isPositive ? "Boosts Quality" : "Detracts Quality";
-      item.innerHTML = `
+    container.innerHTML = notifs.slice(0, 6).map(n => `
+      <div class="p-3 border-b border-slate-100 hover:bg-slate-50 transition flex items-start gap-2.5 ${!n.read ? 'bg-teal-50/40' : ''}">
+        <div class="w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.read ? 'bg-teal-500' : 'bg-transparent'}"></div>
         <div>
-          <span style="font-weight: 600;">${factor.label}</span>
-          <span style="color: #8b949e; font-size: 0.78rem;"> (${factor.value} ${factor.unit})</span>
+          <h5 class="text-xs font-bold text-slate-800">${n.title}</h5>
+          <p class="text-[11px] text-slate-600 mt-0.5 leading-tight">${n.message}</p>
+          <span class="text-[10px] text-slate-400 font-mono-code block mt-1">${n.time}</span>
         </div>
-        <span class="${badgeClass}">
-          ${sign}${factor.contribution.toFixed(2)} (${directionDesc})
-        </span>
-      `;
-      impactList.appendChild(item);
+      </div>
+    `).join('');
+  },
+
+  markAllNotificationsRead() {
+    window.mediStore.markAllNotificationsRead();
+    this.renderNotifications();
+    this.showToast('All notifications marked as read', 'info');
+  },
+
+  // ----------------------------------------------------
+  // Toast Notification System
+  // ----------------------------------------------------
+  showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold transform transition-all duration-300 translate-y-4 opacity-0 border ${
+      type === 'success' ? 'bg-slate-900 text-white border-emerald-500/50' :
+      type === 'error' ? 'bg-red-950 text-white border-red-500/50' :
+      type === 'warning' ? 'bg-amber-950 text-white border-amber-500/50' :
+      'bg-slate-900 text-white border-teal-500/50'
+    }`;
+
+    const iconColor = type === 'success' ? 'text-emerald-400' :
+                      type === 'error' ? 'text-red-400' :
+                      type === 'warning' ? 'text-amber-400' : 'text-teal-400';
+
+    toast.innerHTML = `
+      <span class="${iconColor} flex items-center">
+        <i data-lucide="${type === 'success' ? 'check-circle-2' : type === 'error' ? 'alert-octagon' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-4 h-4"></i>
+      </span>
+      <span>${message}</span>
+    `;
+
+    container.appendChild(toast);
+    if (window.lucide) window.lucide.createIcons();
+
+    requestAnimationFrame(() => {
+      toast.classList.remove('translate-y-4', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
     });
+
+    setTimeout(() => {
+      toast.classList.add('translate-y-4', 'opacity-0');
+      setTimeout(() => toast.remove(), 300);
+    }, 3500);
+  },
+
+  // ----------------------------------------------------
+  // Modal Utilities
+  // ----------------------------------------------------
+  openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+  },
+
+  closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('hidden');
+  },
+
+  closeAllModals() {
+    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+      modal.classList.add('hidden');
+    });
+  },
+
+  resetDemoData() {
+    if (confirm('Reset MediVault to clean initial demo data? All temporary tests will be reset.')) {
+      window.mediStore.resetDemoData();
+      window.location.reload();
+    }
   }
-}
+};
+
+window.MediVaultApp = MediVaultApp;
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.MediVaultApp.init();
+});

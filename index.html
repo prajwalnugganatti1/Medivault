@@ -3,281 +3,1735 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wine Quality Classifier | Machine Learning Enology Lab</title>
-  <meta name="description" content="Predict wine quality from 11 chemical properties (pH, alcohol, acidity, sulfur dioxide) using machine learning. Based on Cortez et al. UCI dataset." />
+  <title>MediVault — Centralized Digital Medical Record, Consent & Prescription Platform</title>
+  <meta name="description" content="A secure, patient-centric digital health record and prescription management platform connecting patients, doctors, and hospital administrators with cryptographic consent and AI assistance." />
 
-  <!-- Google Fonts: Outfit -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teal: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+              950: '#042f2e',
+            }
+          }
+        }
+      }
+    }
+  </script>
 
-  <!-- Chart.js for Radar Visualization -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- QRCode.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- html2pdf.js for Client-side PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
-  <div class="container">
-    <!-- Header Section -->
-    <header class="app-header">
-      <div class="badge-pill">
-        <span>🍷</span> Machine Learning Enology Engine
-      </div>
-      <h1 class="header-title">Wine Quality Classifier</h1>
-      <p class="header-subtitle">
-        Leverage 11 physicochemical properties to evaluate wine balance, detect defects, 
-        and categorize vintages as <strong>Good</strong> or <strong>Defective</strong> in real-time.
-      </p>
-    </header>
+  <!-- ========================================================== -->
+  <!-- 1. AUTHENTICATION & LOGIN SCREEN (DISPLAYED BEFORE ENTRY) -->
+  <!-- ========================================================== -->
+  <div id="auth-screen-container" class="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white relative overflow-hidden">
+    
+    <!-- Ambient glow circles -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-      <button class="tab-btn active" id="tabLab">
-        <span>🧪</span> Interactive Lab
-      </button>
-      <button class="tab-btn" id="tabBatch">
-        <span>📁</span> Batch CSV Analysis
-      </button>
-      <button class="tab-btn" id="tabGuide">
-        <span>📖</span> Science & Chemistry Guide
-      </button>
-    </nav>
-
-    <!-- SECTION 1: INTERACTIVE LAB -->
-    <div id="labSection" class="main-grid">
+    <div class="max-w-lg w-full z-10 space-y-6">
       
-      <!-- LEFT COLUMN: Chemical Properties Input -->
-      <div>
-        <!-- Control Bar: Wine Type & Presets -->
-        <div class="glass-panel control-bar">
-          <div>
-            <span style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 0.5rem; font-weight: 600;">VARIETAL:</span>
-            <div class="segmented-control">
-              <button class="segmented-btn active" id="wineTypeRed">
-                <span>🔴</span> Red Wine
-              </button>
-              <button class="segmented-btn" id="wineTypeWhite">
-                <span>⚪</span> White Wine
-              </button>
-            </div>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <label for="presetSelector" style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">PRESET:</label>
-            <select id="presetSelector" class="preset-select">
-              <option value="red-bordeaux">Grand Cru Reserve Cabernet (Good)</option>
-              <option value="red-spoiled">Vinegar-Spoiled Table Red (Bad)</option>
-              <option value="white-sauvignon">Marlborough Sauvignon Blanc (Good)</option>
-              <option value="white-oxidized">Oxidized Bulk White (Bad)</option>
-              <option value="table-average">Everyday Table Wine (Borderline)</option>
-            </select>
-            <button id="resetDefaultsBtn" class="btn btn-outline" style="padding: 0.45rem 0.8rem; font-size: 0.8rem;" title="Reset Sliders">
-              ↺ Reset
-            </button>
-          </div>
+      <!-- Brand Header -->
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-400 flex items-center justify-center text-slate-950 mx-auto shadow-xl shadow-teal-500/20 mb-4">
+          <i data-lucide="shield-check" class="w-9 h-9"></i>
+        </div>
+        <h1 class="text-3xl font-black tracking-tight text-white">MediVault</h1>
+        <p class="text-xs text-teal-300 font-medium mt-1">Centralized Medical Record & Prescription Management Network</p>
+        <div class="flex items-center justify-center gap-2 mt-3">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-bold border border-teal-500/30 text-[10px]">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span> ABDM & HIPAA Secure
+          </span>
+          <span class="text-[10px] text-slate-400">Zero-Trust Patient Consent</span>
         </div>
 
-        <!-- Sliders Container (Populated dynamically by app.js) -->
-        <div id="slidersContainer"></div>
-      </div>
-
-      <!-- RIGHT COLUMN: Real-Time Results & Diagnostics -->
-      <div>
-        <div class="glass-panel prediction-panel">
-          
-          <!-- Quality Verdict Card -->
-          <div id="resultCard" class="result-card is-good">
-            <span id="verdictBadge" class="verdict-badge good">GOOD QUALITY</span>
-
-            <!-- Animated SVG Probability Gauge -->
-            <div class="gauge-wrapper">
-              <svg class="gauge-svg" width="170" height="170" viewBox="0 0 170 170">
-                <circle class="gauge-bg" cx="85" cy="85" r="70" />
-                <circle id="gaugeFillCircle" class="gauge-fill" cx="85" cy="85" r="70" />
-              </svg>
-              <div class="gauge-center-text">
-                <div id="gaugeScoreText" class="gauge-score">88%</div>
-                <div class="gauge-label">Quality Index</div>
-              </div>
-            </div>
-
-            <!-- Sommelier Tasting Notes -->
-            <div id="sommelierNoteBox" class="sommelier-notes">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- Radar Chart: Chemical Fingerprint -->
-          <div class="glass-panel chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title">
-                <span>🕸️</span> Chemical Fingerprint vs. Good Wine Benchmark
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="radarCanvas"></canvas>
-            </div>
-          </div>
-
-          <!-- Top Driving Factors Breakdown -->
-          <div class="glass-panel" style="padding: 1.25rem 1.5rem;">
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px;">
-              ⚡ Key Influencing Factors
-            </div>
-            <div id="impactFactorsList" class="impact-list">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <!-- SECTION 2: BATCH CSV ANALYSIS -->
-    <div id="batchSection" class="batch-section">
-      <div class="glass-panel" style="padding: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-          <div>
-            <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">Batch Wine Quality Predictor</h2>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">
-              Upload a CSV of physicochemical wine samples to classify the entire batch simultaneously.
-            </p>
-          </div>
-          <a href="sample_wines.csv" download="sample_wines.csv" class="btn btn-outline" style="font-size: 0.85rem;">
-            📥 Download Sample CSV
-          </a>
-        </div>
-
-        <!-- Drag & Drop Zone -->
-        <div id="dropZone" class="drop-zone">
-          <div class="drop-icon">📊</div>
-          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Drag and drop your wine CSV here</h3>
-          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
-            or click to browse from your device (.csv format)
-          </p>
-          <input type="file" id="batchFileInput" accept=".csv" style="display: none;" />
-          <button class="btn btn-primary" onclick="document.getElementById('batchFileInput').click()">
-            Select CSV File
-          </button>
-        </div>
-
-        <!-- Batch Results Card -->
-        <div id="batchResultsCard" style="display: none; margin-top: 2rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-            <div id="batchSummaryText" style="font-size: 0.95rem;"></div>
-            <button id="downloadResultsBtn" class="btn btn-gold">
-              💾 Export Classified CSV
-            </button>
-          </div>
-
-          <div class="table-responsive">
-            <table class="batch-table">
-              <thead>
-                <tr>
-                  <th>Wine Label</th>
-                  <th>Alcohol</th>
-                  <th>Volatile Acidity</th>
-                  <th>pH</th>
-                  <th>Verdict</th>
-                  <th>Good Probability</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody id="batchTableBody">
-                <!-- Populated via batch.js -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- MODAL: SCIENCE & CHEMISTRY GUIDE -->
-    <div id="guideModal" class="modal-overlay">
-      <div class="glass-panel modal-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 1rem;">
-          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--accent-gold);">
-            🔬 The Enological Chemistry Behind Wine Quality
-          </h2>
-          <button id="closeGuideModal" style="background: transparent; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;">
-            &times;
-          </button>
-        </div>
-
-        <div style="font-size: 0.92rem; color: #c9d1d9; display: flex; flex-direction: column; gap: 1.2rem;">
-          <p>
-            Wine evaluation combines subjective sensory perception with objective chemical compounds. 
-            Based on research by <em>Cortez et al., 2009</em> at the University of Minho, the dataset models 
-            the relationship between 11 physicochemical measurements and expert sensory ratings:
-          </p>
-
-          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid var(--accent-gold); padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
-            <h4 style="color: #fff; margin-bottom: 0.2rem;">1. Volatile Acidity (Acetic Acid - Spoilage Indicator)</h4>
-            <p>
-              Acetic acid creates vinegar odor and acrid taste. High volatile acidity (&gt;0.65 g/dm³ in reds, &gt;0.45 g/dm³ in whites) 
-              is the single most direct chemical defect signaling bacterial spoilage (<em>Acetobacter</em>).
-            </p>
-          </div>
-
-          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid #3fb950; padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
-            <h4 style="color: #fff; margin-bottom: 0.2rem;">2. Alcohol &amp; Density (Body and Structure)</h4>
-            <p>
-              Higher natural alcohol percentages (11.5% - 13.5% vol) strongly correlate with premium vintages, 
-              providing body, flavor extraction, and perceived sweet warmth that balances tannins.
-            </p>
-          </div>
-
-          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid #e2c077; padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
-            <h4 style="color: #fff; margin-bottom: 0.2rem;">3. Sulphates &amp; Sulfur Dioxide (Preservation Stability)</h4>
-            <p>
-              Potassium sulphate (K₂SO₄) acts as an antioxidant and antimicrobial stabilizer. 
-              Adequate free SO₂ prevents premature oxidation (browning and sherry-like off-flavors), 
-              while excessive total SO₂ yields unpleasant burnt-match aromas.
-            </p>
-          </div>
-
-          <div style="background: rgba(0,0,0,0.3); border-left: 3px solid #58a6ff; padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0;">
-            <h4 style="color: #fff; margin-bottom: 0.2rem;">4. Fixed Acidity, Citric Acid &amp; pH (Crispness &amp; Equilibrium)</h4>
-            <p>
-              Fixed acids (principally tartaric and malic) maintain proper pH (ideally 3.0 to 3.6). 
-              Citric acid imparts palate freshness. When pH climbs above 3.7, wines feel flat, flabby, and vulnerable to spoilage.
-            </p>
-          </div>
-        </div>
-
-        <div style="text-align: right; margin-top: 1.5rem;">
-          <button class="btn btn-primary" onclick="document.getElementById('guideModal').classList.remove('active')">
-            Close Chemistry Guide
+        <!-- Live Dispatch Setup Quick Access -->
+        <div class="mt-3 flex justify-center">
+          <button type="button" onclick="AuthController.openDispatchSetupModal()" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-400/30 text-xs font-semibold backdrop-blur-sm transition">
+            <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+            <span id="header-dispatch-status-badge">⚡ Real Dispatch: Configure Gmail & SMS</span>
           </button>
         </div>
       </div>
-    </div>
 
-    <!-- Footer Section -->
-    <footer class="app-footer">
-      <p style="margin-bottom: 0.5rem;">
-        Wine Quality Classifier &bull; Built with Machine Learning, HTML5, CSS3, and Vanilla JavaScript.
-      </p>
-      <p style="font-size: 0.78rem;">
-        Dataset: P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. <em>Modeling wine preferences by data mining from physicochemical properties</em>, Decision Support Systems, Elsevier, 47(4):547-553, 2009.
-      </p>
-      <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 1.5rem;">
-        <a href="https://github.com" target="_blank" rel="noopener">GitHub Repository</a>
-        <a href="sample_wines.csv" download>Sample Dataset CSV</a>
-        <a href="LICENSE">MIT License</a>
+      <!-- Authentication Box -->
+      <div class="bg-white text-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200/80">
+        
+        <!-- Role Tabs: Patient, Doctor, Administrator -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+          <button type="button" onclick="AuthController.switchAuthRole('patient')" id="auth-tab-patient" class="flex-1 py-2.5 text-center text-xs font-black flex items-center justify-center gap-1.5 transition text-teal-700 border-b-2 border-teal-600">
+            <i data-lucide="user" class="w-4 h-4"></i> Patient
+          </button>
+          <button type="button" onclick="AuthController.switchAuthRole('doctor')" id="auth-tab-doctor" class="flex-1 py-2.5 text-center text-xs font-bold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-cyan-700 border-b-2 border-transparent">
+            <i data-lucide="stethoscope" class="w-4 h-4"></i> Doctor
+          </button>
+          <button type="button" onclick="AuthController.switchAuthRole('admin')" id="auth-tab-admin" class="flex-1 py-2.5 text-center text-xs font-bold flex items-center justify-center gap-1.5 transition text-slate-400 hover:text-purple-700 border-b-2 border-transparent">
+            <i data-lucide="shield" class="w-4 h-4"></i> Admin
+          </button>
+        </div>
+
+        <!-- Dynamic Form Container -->
+        <div id="auth-portal-card">
+          <!-- Rendered dynamically by AuthController.renderAuthPortal() -->
+        </div>
+
       </div>
-    </footer>
 
+      <!-- Security Notice Footer -->
+      <div class="text-center text-slate-400 text-[11px] leading-relaxed">
+        <p>End-to-End Cryptographic Patient Consent Architecture</p>
+        <p class="text-slate-500 mt-0.5">MediVault Platform • Verified Telephony & SMTP Routing</p>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Application Scripts -->
-  <script src="js/model.js"></script>
-  <script src="js/charts.js"></script>
-  <script src="js/batch.js"></script>
+
+  <!-- ========================================================== -->
+  <!-- 2. MAIN APPLICATION CONTAINER (AFTER LOGIN) -->
+  <!-- ========================================================== -->
+  <div id="main-app-container" class="hidden min-h-screen flex flex-col">
+    
+    <!-- Main Header -->
+    <header class="glass-nav sticky top-0 z-40 px-4 lg:px-8 py-3.5 no-print">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="MediVaultApp.navigateTo(MediVaultApp.currentRole === 'doctor' ? 'doctor-dashboard' : 'patient-dashboard')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-700 to-teal-500 flex items-center justify-center text-white shadow-md shadow-teal-700/20">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-teal-800 to-teal-600 bg-clip-text text-transparent">MediVault</span>
+              <span id="role-badge" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-teal-50 text-teal-700 border border-teal-200">Patient Portal</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium hidden sm:block">Centralized Health Record & Consent Network</p>
+          </div>
+        </div>
+
+        <!-- Role Indicator & Security Settings -->
+        <div class="flex items-center gap-2">
+          <button id="header-credentials-btn" onclick="AuthController.openChangeCredentialsModal(MediVaultApp.currentRole)" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 text-slate-700 text-xs font-semibold transition">
+            <i data-lucide="key" class="w-3.5 h-3.5 text-teal-600"></i> Change Username / Password
+          </button>
+          <button onclick="AuthController.openDispatchSetupModal()" class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-teal-200 hover:border-teal-300 bg-teal-50/70 text-teal-800 text-xs font-semibold transition" title="Configure Real Dispatch">
+            <i data-lucide="radio" class="w-3.5 h-3.5 text-teal-600"></i> Dispatch Setup
+          </button>
+        </div>
+
+        <!-- Right Header Tools -->
+        <div class="flex items-center gap-3">
+          
+          <!-- AI Chat Header Trigger -->
+          <button onclick="AIChatController.toggleChat()" title="Open MediBot AI" class="p-2 rounded-xl text-teal-700 hover:bg-teal-50 transition relative">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
+          </button>
+
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notif-bell-btn" onclick="MediVaultApp.toggleNotifications()" class="relative p-2 rounded-xl text-slate-600 hover:text-teal-700 hover:bg-slate-100 transition">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+              <span id="notif-unread-badge" class="absolute top-1.5 right-1.5 w-4 h-4 bg-teal-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center">2</span>
+            </button>
+
+            <!-- Notifications Dropdown Box -->
+            <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50">
+              <div class="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Audit & Security Notifications</h4>
+                <button onclick="MediVaultApp.markAllNotificationsRead()" class="text-[11px] text-teal-700 hover:underline font-medium">Mark all read</button>
+              </div>
+              <div id="notifications-list" class="max-h-72 overflow-y-auto divide-y divide-slate-100"></div>
+            </div>
+          </div>
+
+          <!-- User Demographics & Logout Button -->
+          <div class="flex items-center gap-2 pl-3 border-l border-slate-200">
+            <img id="header-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-teal-200" />
+            <div class="hidden md:block text-left">
+              <span id="header-user-name" class="block text-xs font-bold text-slate-800 leading-tight">Aarav Patel</span>
+              <span id="header-user-sub" class="block text-[10px] text-teal-700 font-mono-code">ID: MV-88219</span>
+            </div>
+            <button onclick="MediVaultApp.logout()" title="Logout" class="ml-2 p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition flex items-center gap-1">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              <span class="text-xs font-semibold hidden lg:inline">Logout</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Secondary Navigation Bar -->
+    <nav class="bg-white border-b border-slate-200/80 px-4 lg:px-8 py-2 sticky top-[69px] z-30 shadow-xs no-print">
+      <div class="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto">
+        
+        <!-- Patient Nav Links -->
+        <div id="nav-patient" class="flex items-center gap-1.5">
+          <button id="nav-link-patient-dashboard" onclick="MediVaultApp.navigateTo('patient-dashboard')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-teal-600 text-white shadow-sm transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </button>
+          <button id="nav-link-patient-records" onclick="MediVaultApp.navigateTo('patient-records')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="folder-archive" class="w-4 h-4"></i> Medical Records
+          </button>
+          <button id="nav-link-patient-prescriptions" onclick="MediVaultApp.navigateTo('patient-prescriptions')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="pill" class="w-4 h-4"></i> Prescriptions
+          </button>
+          <button id="nav-link-patient-access" onclick="MediVaultApp.navigateTo('patient-access')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="key-round" class="w-4 h-4"></i> Consent & Access
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-active ml-0.5"></span>
+          </button>
+          <button id="nav-link-patient-profile" onclick="MediVaultApp.navigateTo('patient-profile')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="user-cog" class="w-4 h-4"></i> Health Profile
+          </button>
+          <button id="nav-link-patient-timeline" onclick="MediVaultApp.navigateTo('patient-timeline')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="git-commit" class="w-4 h-4"></i> Timeline
+          </button>
+        </div>
+
+        <!-- Doctor Nav Links -->
+        <div id="nav-doctor" class="hidden flex items-center gap-1.5">
+          <button id="nav-link-doctor-dashboard" onclick="MediVaultApp.navigateTo('doctor-dashboard'); DoctorController.endAuthorizedSession();" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-cyan-600 text-white shadow-sm transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Doctor Portal
+          </button>
+          <button onclick="DoctorController.quickDemoAccess('MV-9482')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="user-check" class="w-4 h-4"></i> Authorized Patients
+          </button>
+          <button onclick="DoctorController.openQRScanner()" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="qr-code" class="w-4 h-4"></i> Scan Patient QR
+          </button>
+          <button onclick="AuthController.openChangeCredentialsModal('doctor')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-cyan-800 bg-cyan-50 hover:bg-cyan-100 transition">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i> Change Password / Key (Gmail OTP)
+          </button>
+        </div>
+
+        <!-- Admin Nav Links -->
+        <div id="nav-admin" class="hidden flex items-center gap-1.5">
+          <button id="admin-tab-btn-keys" onclick="AdminController.switchAdminTab('keys')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-purple-600 text-white shadow-sm transition">
+            <i data-lucide="key" class="w-4 h-4"></i> Doctor Special Keys
+          </button>
+          <button id="admin-tab-btn-patients" onclick="AdminController.switchAdminTab('patients')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="users" class="w-4 h-4"></i> Patients Oversight
+          </button>
+          <button id="admin-tab-btn-doctors" onclick="AdminController.switchAdminTab('doctors')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="stethoscope" class="w-4 h-4"></i> Doctors Registry
+          </button>
+          <button id="admin-tab-btn-insights" onclick="AdminController.switchAdminTab('insights')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Platform Insights
+          </button>
+          <button onclick="AuthController.openChangeCredentialsModal('admin')" class="nav-item px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-purple-800 bg-purple-50 hover:bg-purple-100 transition">
+            <i data-lucide="shield-check" class="w-4 h-4"></i> Change Admin Key (Gmail OTP)
+          </button>
+        </div>
+
+        <!-- Quick Share Action in Nav -->
+        <div class="hidden sm:block">
+          <button onclick="PatientController.openShareModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share Records
+          </button>
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8">
+
+      <!-- ====================================================== -->
+      <!-- A. PATIENT VIEWS WRAPPER -->
+      <!-- ====================================================== -->
+      <div id="patient-views-container">
+        
+        <!-- View 1: Patient Dashboard -->
+        <section id="view-patient-dashboard" class="space-y-6">
+          <div class="bg-gradient-to-r from-teal-900 via-teal-800 to-slate-900 text-white rounded-3xl p-6 lg:p-8 shadow-xl relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <div class="inline-flex items-center gap-2 bg-teal-500/20 text-teal-300 px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-teal-500/30">
+                  <span class="w-2 h-2 rounded-full bg-teal-400 pulse-active"></span>
+                  <span>MediVault Encrypted Profile • ABDM & HIPAA Aligned</span>
+                </div>
+                <h2 id="patient-greeting" class="text-2xl lg:text-3xl font-extrabold tracking-tight">
+                  Good morning, Aarav Patel
+                </h2>
+                <p id="patient-health-summary" class="text-slate-300 text-sm mt-1 max-w-2xl">
+                  Digital Vault ID: MV-88219 • Blood Group: O+ • All chronic vitals stable
+                </p>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <button onclick="PatientController.openShareModal()" class="px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-teal-500/30 transition flex items-center gap-2">
+                  <i data-lucide="qr-code" class="w-4 h-4"></i> Give Doctor Access
+                </button>
+                <button onclick="MediVaultApp.openModal('upload-record-modal')" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur transition flex items-center gap-2 border border-white/20">
+                  <i data-lucide="upload" class="w-4 h-4"></i> Upload Report
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Metric Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div onclick="MediVaultApp.navigateTo('patient-records')" class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm card-hover cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500">Medical Records</span>
+                <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                  <i data-lucide="folder-archive" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="stat-total-records" class="text-2xl font-extrabold text-slate-900">5</span>
+                <span class="text-xs text-teal-600 font-medium">Reports & Scans</span>
+              </div>
+            </div>
+
+            <div onclick="MediVaultApp.navigateTo('patient-prescriptions')" class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm card-hover cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500">Digital Prescriptions</span>
+                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <i data-lucide="pill" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="stat-total-rx" class="text-2xl font-extrabold text-slate-900">2</span>
+                <span class="text-xs text-blue-600 font-medium">Digital Rx Issued</span>
+              </div>
+            </div>
+
+            <div onclick="MediVaultApp.navigateTo('patient-timeline')" class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm card-hover cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500">Consultations</span>
+                <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <i data-lucide="stethoscope" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="stat-total-consultations" class="text-2xl font-extrabold text-slate-900">2</span>
+                <span class="text-xs text-purple-600 font-medium">Recorded Visits</span>
+              </div>
+            </div>
+
+            <div onclick="MediVaultApp.navigateTo('patient-profile')" class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm card-hover cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-slate-500">Active Medications</span>
+                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="stat-active-meds" class="text-2xl font-extrabold text-slate-900">3</span>
+                <span class="text-xs text-amber-600 font-medium">Daily Regimens</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Row -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Quick Actions</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <button onclick="MediVaultApp.openModal('upload-record-modal')" class="p-3 rounded-xl border border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 text-left transition group">
+                <i data-lucide="file-up" class="w-5 h-5 text-teal-600 mb-2 group-hover:scale-110 transition"></i>
+                <span class="block text-xs font-bold text-slate-800">Upload Report</span>
+                <span class="text-[10px] text-slate-500">PDFs, Scans, Labs</span>
+              </button>
+              <button onclick="MediVaultApp.navigateTo('patient-prescriptions')" class="p-3 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 text-left transition group">
+                <i data-lucide="file-plus" class="w-5 h-5 text-blue-600 mb-2 group-hover:scale-110 transition"></i>
+                <span class="block text-xs font-bold text-slate-800">Add Prescription</span>
+                <span class="text-[10px] text-slate-500">View or Upload</span>
+              </button>
+              <button onclick="PatientController.openShareModal()" class="p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 text-left transition group">
+                <i data-lucide="key" class="w-5 h-5 text-emerald-600 mb-2 group-hover:scale-110 transition"></i>
+                <span class="block text-xs font-bold text-slate-800">Share Records</span>
+                <span class="text-[10px] text-slate-500">Generate QR / Code</span>
+              </button>
+              <button onclick="AIChatController.toggleChat()" class="p-3 rounded-xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50/40 text-left transition group">
+                <i data-lucide="sparkles" class="w-5 h-5 text-purple-600 mb-2 group-hover:scale-110 transition"></i>
+                <span class="block text-xs font-bold text-slate-800">Ask MediBot AI</span>
+                <span class="text-[10px] text-slate-500">Health Assistant</span>
+              </button>
+              <button onclick="MediVaultApp.navigateTo('patient-timeline')" class="p-3 rounded-xl border border-slate-200 hover:border-cyan-500 hover:bg-cyan-50/40 text-left transition group">
+                <i data-lucide="history" class="w-5 h-5 text-cyan-600 mb-2 group-hover:scale-110 transition"></i>
+                <span class="block text-xs font-bold text-slate-800">Medical Timeline</span>
+                <span class="text-[10px] text-slate-500">Full History</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Emergency Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <div class="flex items-center justify-between mb-5">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">Recent Medical Activity</h3>
+                  <p class="text-xs text-slate-500">Chronological feed of your consultations and investigations</p>
+                </div>
+                <button onclick="MediVaultApp.navigateTo('patient-timeline')" class="text-xs text-teal-700 hover:underline font-bold flex items-center gap-1">
+                  View All <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div id="recent-activity-container" class="mt-4"></div>
+            </div>
+
+            <div class="space-y-6">
+              <div id="dash-emergency-card" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm"></div>
+
+              <div class="bg-gradient-to-br from-slate-900 to-teal-950 text-white p-6 rounded-3xl shadow-sm border border-teal-800/40">
+                <div class="flex items-center gap-2 mb-2 text-teal-400">
+                  <i data-lucide="lock" class="w-4 h-4"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider">Patient Consent Active</span>
+                </div>
+                <h4 class="font-bold text-sm mb-1">Your Records Are Private</h4>
+                <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                  Doctors cannot browse your records without your permission. Generate a temporary QR/code when you visit a clinic.
+                </p>
+                <button onclick="PatientController.openShareModal()" class="w-full py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 rounded-xl font-bold text-xs transition">
+                  Create Doctor Access Code
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- View 2: Medical Records -->
+        <section id="view-patient-records" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight">Medical Records & Diagnostic Reports</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Centralized repository for blood tests, radiology scans, pathology, and discharge summaries.</p>
+            </div>
+            <button onclick="MediVaultApp.openModal('upload-record-modal')" class="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-md shadow-teal-700/20 transition flex items-center gap-2 shrink-0">
+              <i data-lucide="plus" class="w-4 h-4"></i> Upload Medical Document
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+                <input id="records-search-input" oninput="PatientController.searchRecords(this.value)" type="text" placeholder="Search by test name, hospital, doctor, or tag..." 
+                       class="w-full text-xs pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-slate-50" />
+              </div>
+              <select onchange="PatientController.sortRecords(this.value)" class="text-xs px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-medium">
+                <option value="newest">Sort: Newest First</option>
+                <option value="oldest">Sort: Oldest First</option>
+                <option value="title">Sort: Name (A-Z)</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+              <button data-filter="all" onclick="PatientController.filterRecords('all')" class="filter-pill-rec px-3 py-1.5 rounded-xl font-bold bg-teal-600 text-white transition shrink-0">
+                All Records
+              </button>
+              <button data-filter="blood test" onclick="PatientController.filterRecords('blood test')" class="filter-pill-rec px-3 py-1.5 rounded-xl font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0">
+                Blood Tests
+              </button>
+              <button data-filter="x-ray" onclick="PatientController.filterRecords('x-ray')" class="filter-pill-rec px-3 py-1.5 rounded-xl font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0">
+                X-Ray & Radiology
+              </button>
+              <button data-filter="ultrasound" onclick="PatientController.filterRecords('ultrasound')" class="filter-pill-rec px-3 py-1.5 rounded-xl font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0">
+                Ultrasound & Scans
+              </button>
+              <button data-filter="hospital discharge summaries" onclick="PatientController.filterRecords('hospital discharge summaries')" class="filter-pill-rec px-3 py-1.5 rounded-xl font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition shrink-0">
+                Discharge Summaries
+              </button>
+            </div>
+          </div>
+
+          <div id="records-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- View 3: Prescriptions -->
+        <section id="view-patient-prescriptions" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight">Prescriptions Vault</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Access digital doctor prescriptions, dosage instructions, and download printable PDFs.</p>
+            </div>
+          </div>
+          <div id="prescriptions-list-container"></div>
+        </section>
+
+        <!-- View 4: Access & Consent Management -->
+        <section id="view-patient-access" class="hidden space-y-6">
+          <div class="bg-white rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="max-w-2xl">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Patient Consent Architecture
+              </span>
+              <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Doctor Access & Permission Control</h2>
+              <p class="text-xs text-slate-600 leading-relaxed mt-1">
+                Doctors cannot browse or query your medical history by default. You generate an ephemeral access code or QR code to grant access for a consultation. You can revoke permissions at any moment with immediate effect.
+              </p>
+            </div>
+            <button onclick="PatientController.openShareModal()" class="px-5 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold text-xs shadow-md shadow-teal-700/20 transition flex items-center gap-2 shrink-0">
+              <i data-lucide="qr-code" class="w-4 h-4"></i> Generate New Access Code
+            </button>
+          </div>
+
+          <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm">Access Audit Trail</h3>
+                <p class="text-xs text-slate-500">History of authorized clinical sessions and doctors who accessed your vault</p>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-3.5">Doctor & Access Code</th>
+                    <th class="p-3.5">Hospital / Clinic</th>
+                    <th class="p-3.5">Access Scope</th>
+                    <th class="p-3.5">Granted Date</th>
+                    <th class="p-3.5">Expires</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="access-history-table-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- View 5: Health Profile -->
+        <section id="view-patient-profile" class="hidden space-y-6">
+          <div>
+            <h2 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight">Patient Health Profile</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Manage personal demographics, critical allergies, emergency contacts, and family history.</p>
+          </div>
+
+          <form onsubmit="PatientController.handleSaveProfile(event)" class="space-y-6">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                <i data-lucide="user" class="w-4 h-4 text-teal-600"></i> Personal Information
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Full Legal Name</label>
+                  <input id="prof-name" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-bold" required />
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Date of Birth</label>
+                  <input id="prof-dob" type="date" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800" required />
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Gender</label>
+                  <select id="prof-gender" class="w-full p-2.5 rounded-xl border border-slate-200 bg-white">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Blood Group</label>
+                  <select id="prof-blood" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold bg-white">
+                    <option value="O+">O+</option>
+                    <option value="A+">A+</option>
+                    <option value="B+">B+</option>
+                    <option value="AB+">AB+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Phone Number</label>
+                  <input id="prof-phone" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Email Address</label>
+                  <input id="prof-email" type="email" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-slate-500 font-medium mb-1">Residential Address</label>
+                  <input id="prof-address" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                <i data-lucide="phone-call" class="w-4 h-4 text-red-600"></i> Emergency Information
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Emergency Contact Person</label>
+                  <input id="prof-emergency-name" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-slate-800" />
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Relationship</label>
+                  <input id="prof-emergency-rel" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Emergency Contact Number</label>
+                  <input id="prof-emergency-phone" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 font-mono-code font-bold text-slate-800" />
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                <i data-lucide="heart-pulse" class="w-4 h-4 text-teal-600"></i> Clinical History & Allergies
+              </h3>
+              <div class="space-y-4 text-xs">
+                <div class="bg-red-50/50 p-4 rounded-2xl border border-red-200">
+                  <label class="block text-red-900 font-bold mb-1 flex items-center gap-1.5">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600"></i> Known Drug Allergies (Comma separated)
+                  </label>
+                  <input id="prof-allergies" type="text" placeholder="e.g. Penicillin, Sulfa drugs, Aspirin" 
+                         class="w-full p-2.5 rounded-xl border border-red-300 focus:ring-2 focus:ring-red-500 bg-white text-red-900 font-bold" />
+                  <p class="text-[11px] text-red-700 mt-1">These will be prominently highlighted as critical warnings to any doctor accessing your vault.</p>
+                </div>
+
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Existing Chronic Conditions (Comma separated)</label>
+                  <input id="prof-conditions" type="text" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Previous Surgeries (One per line)</label>
+                  <textarea id="prof-surgeries" rows="2" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800"></textarea>
+                </div>
+                <div>
+                  <label class="block text-slate-500 font-medium mb-1">Family Medical History (One per line)</label>
+                  <textarea id="prof-family" rows="2" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button type="submit" class="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold text-xs shadow-md shadow-teal-700/20 transition flex items-center gap-2">
+                <i data-lucide="save" class="w-4 h-4"></i> Save Health Profile Changes
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- View 6: Medical Timeline -->
+        <section id="view-patient-timeline" class="hidden space-y-6">
+          <div>
+            <h2 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight">Comprehensive Medical Timeline</h2>
+            <p class="text-xs text-slate-500 mt-0.5">A complete chronological healthcare journey combining doctor consultations, prescriptions, and lab investigations.</p>
+          </div>
+          <div class="bg-white rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm">
+            <div id="full-timeline-container" class="mt-4"></div>
+          </div>
+        </section>
+
+      </div><!-- /patient-views-container -->
+
+
+      <!-- ====================================================== -->
+      <!-- B. DOCTOR VIEWS WRAPPER -->
+      <!-- ====================================================== -->
+      <div id="doctor-views-container" class="hidden">
+        
+        <!-- Subview 1: Doctor Gateway & Dashboard -->
+        <div id="doc-dashboard-view" class="space-y-6">
+          <div class="bg-gradient-to-r from-slate-900 via-cyan-950 to-slate-900 text-white rounded-3xl p-6 lg:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+              <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=80" alt="Doctor" class="w-16 h-16 rounded-2xl object-cover border-2 border-cyan-400" />
+              <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold mb-1 border border-cyan-500/30">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Verified Medical Practitioner
+                </div>
+                <h2 id="doctor-profile-name" class="text-xl lg:text-2xl font-extrabold">Dr. Rahul Sharma</h2>
+                <p id="doctor-profile-spec" class="text-xs text-cyan-200 font-medium">MBBS, MD (Internal Medicine) • Critical Care</p>
+                <p id="doctor-profile-hospital" class="text-xs text-slate-300">Apollo Specialty Hospital</p>
+                <p id="doctor-profile-reg" class="text-[11px] text-cyan-400 font-mono-code mt-0.5">Reg No: MCI-2019-84729</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="DoctorController.openQRScanner()" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/30 transition flex items-center gap-2">
+                <i data-lucide="qr-code" class="w-4 h-4"></i> Scan Patient QR
+              </button>
+            </div>
+          </div>
+
+          <!-- Doctor Metric Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 block mb-1">Total Patients Treated</span>
+              <span id="stat-doc-total-patients" class="text-2xl font-extrabold text-slate-900">148</span>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 block mb-1">Today's Consultations</span>
+              <span id="stat-doc-today-consults" class="text-2xl font-extrabold text-slate-900">6</span>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 block mb-1">Active Patient Authorizations</span>
+              <span id="stat-doc-active-access" class="text-2xl font-extrabold text-cyan-700">1</span>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-slate-500 block mb-1">Prescriptions Issued</span>
+              <span id="stat-doc-recent-rx" class="text-2xl font-extrabold text-slate-900">2</span>
+            </div>
+          </div>
+
+          <!-- Patient Access Gateway -->
+          <div class="bg-white rounded-3xl p-6 lg:p-8 border-2 border-cyan-100 shadow-sm">
+            <div class="max-w-3xl">
+              <div class="flex items-center gap-2 text-cyan-700 font-bold text-xs uppercase tracking-wider mb-1">
+                <i data-lucide="shield-check" class="w-4 h-4"></i> Authorized Consent Gateway
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 mb-1">Request & Unlock Patient Medical History</h3>
+              <p class="text-xs text-slate-500 mb-5">
+                To respect patient privacy, MediVault requires patients to grant explicit temporary permission. Enter the patient's ID and 6-digit access code, or scan their QR code.
+              </p>
+
+              <form onsubmit="DoctorController.handleAuthorizeAccess(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Patient ID</label>
+                    <input id="gateway-patient-id" type="text" value="MV-88219" placeholder="e.g. MV-88219" 
+                           class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500 font-mono-code font-bold text-slate-800" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Patient Access Code (from Patient's MediVault)</label>
+                    <input id="gateway-access-code" type="text" placeholder="e.g. MV-9482" 
+                           class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cyan-500 font-mono-code font-bold text-slate-800 uppercase" />
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2 flex-wrap">
+                  <button type="submit" class="px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-bold text-xs shadow-md shadow-cyan-600/20 transition flex items-center gap-2">
+                    <i data-lucide="unlock" class="w-4 h-4"></i> Verify Consent & Unlock Records
+                  </button>
+                  <button type="button" onclick="DoctorController.openQRScanner()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition flex items-center gap-2">
+                    <i data-lucide="scan" class="w-4 h-4"></i> Scan QR Code
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Active Authorized Patients List -->
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm">Active Authorized Sessions</h3>
+                <p class="text-xs text-slate-500">Patients who have granted you active temporary record access</p>
+              </div>
+            </div>
+            <div id="authorized-patients-list"></div>
+          </div>
+        </div>
+
+        <!-- Subview 2: Doctor Authorized Patient Chart View -->
+        <div id="doc-patient-view" class="hidden space-y-6">
+          <div id="doc-consent-banner" class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl"></div>
+
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 id="doc-view-pat-name" class="text-xl font-extrabold text-slate-900">Aarav Patel</h3>
+                  <span class="bg-teal-50 text-teal-700 text-xs px-2.5 py-0.5 rounded-full font-bold">Authorized File</span>
+                </div>
+                <p id="doc-view-pat-meta" class="text-xs text-slate-500 font-medium">ID: MV-88219 • 34 yrs • Male • Blood Group: O+</p>
+                <p id="doc-view-pat-phone" class="text-xs text-slate-500 font-mono-code mt-0.5">+91 98201 45890</p>
+              </div>
+              <div class="text-right">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide block">Emergency Contact</span>
+                <p id="doc-view-pat-emergency" class="text-xs font-bold text-slate-800">Ananya Patel (Spouse) • +91 98201 45899</p>
+              </div>
+            </div>
+
+            <!-- CRITICAL ALLERGIES ALERT BOX -->
+            <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="alert-octagon" class="w-5 h-5 text-red-600"></i>
+                <h4 class="text-xs font-black uppercase tracking-wider text-red-900">Critical Patient Drug Allergies — Caution Before Prescribing</h4>
+              </div>
+              <div id="doc-view-allergies" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <span class="font-bold text-slate-700 block mb-1">Documented Chronic Conditions:</span>
+                <div id="doc-view-conditions" class="flex flex-wrap gap-1.5"></div>
+              </div>
+              <div>
+                <span class="font-bold text-slate-700 block mb-1">Current Active Medications:</span>
+                <div id="doc-view-meds" class="space-y-1"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient Chart Tabs -->
+          <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="flex items-center border-b border-slate-200 px-6 overflow-x-auto text-xs font-bold">
+              <button id="doc-tab-btn-timeline" onclick="DoctorController.switchPatientChartTab('timeline')" class="py-4 px-4 border-b-2 border-teal-600 text-teal-700 font-bold transition flex items-center gap-2 shrink-0">
+                <i data-lucide="git-commit" class="w-4 h-4"></i> Medical Timeline
+              </button>
+              <button id="doc-tab-btn-reports" onclick="DoctorController.switchPatientChartTab('reports')" class="py-4 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2 shrink-0">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Diagnostic Reports & Scans
+              </button>
+              <button id="doc-tab-btn-rx" onclick="DoctorController.switchPatientChartTab('rx')" class="py-4 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2 shrink-0">
+                <i data-lucide="pill" class="w-4 h-4"></i> Past Prescriptions
+              </button>
+              <button id="doc-tab-btn-new-consultation" onclick="DoctorController.switchPatientChartTab('new-consultation')" class="py-4 px-4 border-b-2 border-transparent text-teal-600 hover:text-teal-800 transition flex items-center gap-2 shrink-0 bg-teal-50/50">
+                <i data-lucide="file-plus-2" class="w-4 h-4 text-teal-600"></i> New Consultation & Digital Rx
+              </button>
+            </div>
+
+            <div class="p-6">
+              <div id="doc-tab-panel-timeline">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Patient Health Timeline</h4>
+                <div id="doc-patient-timeline-container"></div>
+              </div>
+
+              <div id="doc-tab-panel-reports" class="hidden">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Patient Uploaded Reports</h4>
+                <div id="doc-patient-reports-container"></div>
+              </div>
+
+              <div id="doc-tab-panel-rx" class="hidden">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Previous Prescriptions</h4>
+                <div id="doc-patient-rx-container"></div>
+              </div>
+
+              <!-- New Consultation & Digital Rx Studio -->
+              <div id="doc-tab-panel-new-consultation" class="hidden space-y-6">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div>
+                    <h3 class="text-base font-bold text-slate-900">New Clinical Consultation & Digital Prescription</h3>
+                    <p class="text-xs text-slate-500">Prescription will be cryptographically certified, logged in the patient's vault, and exportable as PDF.</p>
+                  </div>
+                </div>
+
+                <form onsubmit="PrescriptionEngine.handleSavePrescription(event)" class="space-y-6">
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
+                    <div>
+                      <label class="text-slate-400 block mb-0.5">Doctor Name</label>
+                      <input id="rx-doc-name" type="text" class="w-full font-bold text-slate-800 bg-transparent border-none p-0 focus:ring-0" readonly />
+                    </div>
+                    <div>
+                      <label class="text-slate-400 block mb-0.5">Registration Number</label>
+                      <input id="rx-doc-reg" type="text" class="w-full font-mono-code text-teal-700 bg-transparent border-none p-0 focus:ring-0" readonly />
+                    </div>
+                    <div>
+                      <label class="text-slate-400 block mb-0.5">Patient Name & ID</label>
+                      <input id="rx-pat-name" type="text" class="w-full font-bold text-slate-800 bg-transparent border-none p-0 focus:ring-0" readonly />
+                    </div>
+                    <div>
+                      <label class="text-slate-400 block mb-0.5">Consultation Date</label>
+                      <input id="rx-date" type="date" class="w-full font-medium text-slate-800 bg-transparent border-none p-0 focus:ring-0" />
+                    </div>
+                  </div>
+
+                  <input id="rx-doc-qual" type="hidden" />
+                  <input id="rx-doc-spec" type="hidden" />
+                  <input id="rx-doc-hosp" type="hidden" />
+                  <input id="rx-pat-id" type="hidden" />
+                  <input id="rx-pat-age" type="hidden" />
+                  <input id="rx-pat-gender" type="hidden" />
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Chief Complaint</label>
+                      <textarea id="rx-complaint" rows="2" placeholder="e.g. Fever with chills, persistent dry cough for 3 days..." 
+                                class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800"></textarea>
+                    </div>
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Examination & Symptoms</label>
+                      <textarea id="rx-symptoms" rows="2" placeholder="e.g. Temperature 101.5°F, pharynx inflamed, chest clear..." 
+                                class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800"></textarea>
+                    </div>
+                    <div>
+                      <label class="block font-bold text-teal-800 mb-1">Provisional / Clinical Diagnosis *</label>
+                      <input id="rx-diagnosis" type="text" placeholder="e.g. Acute Viral Pharyngitis" 
+                             class="w-full p-2.5 rounded-xl border border-teal-300 focus:ring-2 focus:ring-teal-500 text-slate-900 font-bold bg-teal-50/30" required />
+                    </div>
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Clinical Notes & Observations</label>
+                      <input id="rx-notes" type="text" placeholder="e.g. Adequate oral hydration, warm saline gargles" 
+                             class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800" />
+                    </div>
+                  </div>
+
+                  <!-- Dynamic Medicines Section -->
+                  <div class="border border-slate-200 rounded-2xl p-4 bg-white space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                      <div>
+                        <h4 class="text-xs uppercase font-bold text-slate-700 tracking-wider">Prescribed Medications</h4>
+                        <p class="text-[11px] text-slate-500">Add multiple drugs with specific dosages, frequencies, and administration timing.</p>
+                      </div>
+                      <button type="button" onclick="PrescriptionEngine.addMedicineRow()" class="px-3 py-1.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Another Drug
+                      </button>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[11px]">
+                      <span class="text-slate-400 font-medium">Quick add:</span>
+                      <button type="button" onclick="PrescriptionEngine.addQuickMed('Paracetamol', '650 mg', '1-0-1 (Twice daily)', '5 days', 'After food', 'Take after food if fever > 99.5F')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-teal-100 text-slate-700 font-medium">+ Paracetamol</button>
+                      <button type="button" onclick="PrescriptionEngine.addQuickMed('Azithromycin', '500 mg', '1 tablet once daily', '3 days', 'Before food', 'Complete full course')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-teal-100 text-slate-700 font-medium">+ Azithromycin</button>
+                      <button type="button" onclick="PrescriptionEngine.addQuickMed('Pantoprazole', '40 mg', '1 tablet once daily', '14 days', 'Empty stomach (Morning)', '30 mins before breakfast')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-teal-100 text-slate-700 font-medium">+ Pantoprazole</button>
+                      <button type="button" onclick="PrescriptionEngine.addQuickMed('Levocetirizine', '5 mg', '0-0-1 (Night only)', '5 days', 'Bedtime', 'May cause drowsiness')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-teal-100 text-slate-700 font-medium">+ Levocetirizine</button>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                      <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                          <tr>
+                            <th class="p-2.5">Medicine Name</th>
+                            <th class="p-2.5">Dosage</th>
+                            <th class="p-2.5">Frequency</th>
+                            <th class="p-2.5">Duration</th>
+                            <th class="p-2.5">Food Timing</th>
+                            <th class="p-2.5">Special Instructions</th>
+                            <th class="p-2.5 text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody id="medicines-table-body"></tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Diet Advice</label>
+                      <input id="rx-diet" type="text" placeholder="e.g. Warm fluids, light digestible meals" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                    </div>
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Rest Advice</label>
+                      <input id="rx-rest" type="text" placeholder="e.g. Strict bed rest for 48 hours" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                    </div>
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Follow-up Date / Review</label>
+                      <input id="rx-followup" type="text" placeholder="e.g. 5 days (08 Oct 2026)" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                    </div>
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1">Tests Recommended</label>
+                      <input id="rx-tests" type="text" placeholder="e.g. Repeat CBC if fever persists > 48h" class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-800" />
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="submit" class="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-md shadow-teal-700/20 transition flex items-center gap-2">
+                      <i data-lucide="check-check" class="w-4 h-4"></i> Save & Issue Digital Prescription
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /doctor-views-container -->
+
+
+      <!-- ====================================================== -->
+      <!-- C. ADMINISTRATOR DASHBOARD CONTAINER -->
+      <!-- ====================================================== -->
+      <div id="admin-views-container" class="hidden space-y-6">
+        
+        <!-- Admin Console Header -->
+        <div class="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white rounded-3xl p-6 lg:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-purple-600 flex items-center justify-center text-white border-2 border-purple-400 shadow-md">
+              <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold mb-1 border border-purple-500/30">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Super-Administrator Control Console
+              </div>
+              <h2 class="text-xl lg:text-2xl font-extrabold">MediVault Health OS Administration</h2>
+              <p class="text-xs text-purple-200">System Governance, Doctor Key Generation & Platform Insights</p>
+              <p class="text-[11px] text-slate-400 font-mono-code mt-0.5">Admin ID: ADMIN-001 • Master Audit Enabled</p>
+            </div>
+          </div>
+          <div>
+            <span class="text-xs text-purple-300 font-mono-code bg-purple-900/50 px-3 py-1.5 rounded-xl border border-purple-700/50">
+              ABDM Compliant • HIPAA Level 3
+            </span>
+          </div>
+        </div>
+
+        <!-- Admin Overview Metric Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <span class="text-[11px] font-semibold text-slate-500 block">Total Patients</span>
+            <span id="admin-stat-patients" class="text-xl font-extrabold text-slate-900">2</span>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <span class="text-[11px] font-semibold text-slate-500 block">Total Doctors</span>
+            <span id="admin-stat-doctors" class="text-xl font-extrabold text-cyan-700">2</span>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <span class="text-[11px] font-semibold text-slate-500 block">Doctor Keys</span>
+            <span id="admin-stat-keys" class="text-xl font-extrabold text-purple-700">4</span>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <span class="text-[11px] font-semibold text-slate-500 block">Medical Files</span>
+            <span id="admin-stat-records" class="text-xl font-extrabold text-teal-700">5</span>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <span class="text-[11px] font-semibold text-slate-500 block">Prescriptions</span>
+            <span id="admin-stat-rx" class="text-xl font-extrabold text-blue-700">2</span>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <span class="text-[11px] font-semibold text-slate-500 block">Active Consent</span>
+            <span id="admin-stat-consent" class="text-xl font-extrabold text-emerald-700">1</span>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB PANEL 1: SPECIAL DOCTOR KEY MANAGEMENT -->
+        <div id="admin-panel-keys" class="space-y-6">
+          <div class="bg-white rounded-3xl p-6 border-2 border-purple-100 shadow-sm">
+            <div class="max-w-3xl">
+              <div class="flex items-center gap-2 text-purple-700 font-bold text-xs uppercase tracking-wider mb-1">
+                <i data-lucide="key" class="w-4 h-4"></i> Doctor Access Key Provisioning
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 mb-1">Generate Special Access Key for Doctors</h3>
+              <p class="text-xs text-slate-500 mb-4">
+                Hospital administrators issue unique keys to verify medical practitioners. When doctors log in or sign up, this key authenticates their hospital affiliation.
+              </p>
+
+              <form onsubmit="AdminController.handleGenerateKey(event)" class="space-y-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Doctor Name (Optional / Pre-assigned)</label>
+                    <input id="new-key-doctor-name" type="text" placeholder="e.g. Dr. Ramesh Gupta" 
+                           class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500 text-slate-800" />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Hospital / Clinic *</label>
+                    <input id="new-key-hospital" type="text" placeholder="e.g. Apollo Hospital / Max Health" 
+                           class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500 text-slate-800" required />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Specialization</label>
+                    <input id="new-key-specialization" type="text" placeholder="e.g. Neurology / Cardiology" 
+                           class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500 text-slate-800" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Administrative Notes</label>
+                  <input id="new-key-notes" type="text" placeholder="e.g. Issued for Chief Resident onboard evaluation" 
+                         class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500 text-slate-800" />
+                </div>
+
+                <div class="pt-2">
+                  <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-md shadow-purple-600/20 transition flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Generate & Issue Special Doctor Key
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm">Issued Doctor Keys Registry</h3>
+                <p class="text-xs text-slate-500">Track and manage active, used, and revoked medical access keys</p>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-3.5">Special Key Code</th>
+                    <th class="p-3.5">Doctor Name</th>
+                    <th class="p-3.5">Hospital / Clinic</th>
+                    <th class="p-3.5">Specialization</th>
+                    <th class="p-3.5">Generated Date</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-doctor-keys-table-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB PANEL 2: PATIENTS OVERSIGHT -->
+        <div id="admin-panel-patients" class="hidden space-y-6">
+          <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900 text-sm">Registered Patients Governance</h3>
+              <p class="text-xs text-slate-500">Overview of all active citizen health profiles registered on MediVault</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-3.5">Patient Name & ID</th>
+                    <th class="p-3.5">Demographics</th>
+                    <th class="p-3.5">Contact Phone</th>
+                    <th class="p-3.5">Email</th>
+                    <th class="p-3.5">Critical Allergies</th>
+                    <th class="p-3.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-patients-table-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB PANEL 3: DOCTORS REGISTRY -->
+        <div id="admin-panel-doctors" class="hidden space-y-6">
+          <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900 text-sm">Verified Healthcare Practitioners</h3>
+              <p class="text-xs text-slate-500">Clinicians authorized through Admin-issued special keys</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100">
+                  <tr>
+                    <th class="p-3.5">Practitioner</th>
+                    <th class="p-3.5">Hospital / Facility</th>
+                    <th class="p-3.5">Specialization</th>
+                    <th class="p-3.5">Assigned Key</th>
+                    <th class="p-3.5">Consultations</th>
+                    <th class="p-3.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-doctors-table-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB PANEL 4: PLATFORM INSIGHTS -->
+        <div id="admin-panel-insights" class="hidden space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <h3 class="font-bold text-slate-900 text-sm mb-1">Diagnostic Records by Category</h3>
+              <p class="text-xs text-slate-500 mb-4">Distribution of patient-uploaded health files</p>
+              <div id="admin-records-breakdown" class="space-y-2"></div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+              <h3 class="font-bold text-slate-900 text-sm mb-1">Recent Security Consent Audits</h3>
+              <p class="text-xs text-slate-500 mb-4">Live record authorization and doctor access sessions</p>
+              <div id="admin-audit-logs-list"></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /admin-views-container -->
+
+    </main>
+
+  </div><!-- /main-app-container -->
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: MSG91 OTP PHONE VERIFICATION -->
+  <!-- ========================================================== -->
+  <div id="auth-otp-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center relative animate-in fade-in zoom-in duration-200 max-h-[92vh] overflow-y-auto">
+      
+      <button type="button" onclick="AuthController.closeOtpModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Icon & Header -->
+      <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3.5 shadow-sm">
+        <i data-lucide="shield-check" class="w-7 h-7"></i>
+      </div>
+
+      <h3 class="text-xl font-black text-slate-900 tracking-tight">Verify Your Mobile Number</h3>
+      
+      <p class="text-xs text-slate-500 mt-1.5">
+        OTP sent to <span id="otp-masked-display" class="font-bold text-slate-900 font-mono-code">+91 ******0000</span>
+      </p>
+
+      <!-- Change Phone Number Option -->
+      <div class="mt-1">
+        <button type="button" onclick="AuthController.changePhoneNumber()" class="text-xs text-teal-600 hover:text-teal-800 font-semibold underline underline-offset-2 transition inline-flex items-center gap-1">
+          <i data-lucide="edit-3" class="w-3 h-3"></i> Change phone number
+        </button>
+      </div>
+
+      <!-- Error Message Container -->
+      <div id="otp-error-message" class="hidden text-xs p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-left font-medium mt-4"></div>
+
+      <!-- Success Message Container -->
+      <div id="otp-success-message" class="hidden text-xs p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-left font-medium mt-4"></div>
+
+      <!-- Demo OTP Box (Instant Demo Login Available) -->
+      <div class="mt-3.5 p-3.5 bg-amber-50 border border-amber-200/80 rounded-2xl text-left flex items-center justify-between shadow-xs">
+        <div>
+          <span class="text-[10px] text-amber-800 font-bold uppercase tracking-wider block">Demo Access</span>
+          <span class="text-xs text-slate-700">Demo OTP: <strong class="font-mono-code font-bold text-amber-900 text-sm">123456</strong></span>
+        </div>
+        <button type="button" onclick="AuthController.fillDemoOtp()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i> Auto-Fill 123456
+        </button>
+      </div>
+
+      <!-- OTP Form -->
+      <form onsubmit="AuthController.handleVerifyOtp(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5 text-center">
+            Enter 6-Digit OTP Code
+          </label>
+          <input id="otp-input-code" type="text" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="• • • • • •" autocomplete="one-time-code"
+                 class="w-full text-center text-3xl font-mono-code font-black tracking-widest p-3.5 rounded-2xl border-2 border-teal-500 focus:ring-4 focus:ring-teal-500/20 text-teal-800 transition" required />
+          
+          <div class="flex items-center justify-between mt-2.5 px-1">
+            <span id="otp-timer-display" class="text-xs text-slate-400 font-mono-code">
+              Resend in 30s
+            </span>
+            <button type="button" id="otp-resend-btn" onclick="AuthController.resendOtp()" disabled
+                    class="text-xs font-bold text-teal-600 hover:text-teal-800 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Resend OTP
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="otp-verify-btn" class="w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md shadow-teal-700/20 transition flex items-center justify-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Verify OTP & Proceed
+        </button>
+
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" onclick="AuthController.quickDemoLogin()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 border border-slate-200">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i> Instant Login (Skip OTP)
+          </button>
+          <button type="button" onclick="AuthController.closeOtpModal()" class="px-3.5 py-2 text-xs text-slate-400 hover:text-slate-600 font-medium transition">
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <!-- MSG91 Gateway Info / Config Link -->
+      <div class="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+        <span class="inline-flex items-center gap-1 font-medium">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-teal-600"></i> MSG91 Official OTP Engine
+        </span>
+        <button type="button" onclick="AuthController.openDispatchSetupModal()" class="text-teal-600 hover:underline font-semibold flex items-center gap-1">
+          <i data-lucide="settings" class="w-3 h-3"></i> MSG91 Settings
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: LIVE DISPATCH CONFIGURATION (GMAIL SMTP & MSG91) -->
+  <!-- ========================================================== -->
+  <div id="dispatch-settings-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200 max-h-[92vh] overflow-y-auto">
+      
+      <button onclick="AuthController.closeDispatchSetupModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-3">
+          <i data-lucide="radio" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900">MSG91 & Gmail Dispatch Settings</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Configure your official MSG91 OTP credentials for direct SMS delivery and Gmail SMTP credentials.</p>
+      </div>
+
+      <!-- Current Status Card -->
+      <div id="dispatch-status-card" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 text-xs">
+        <!-- Dynamically loaded -->
+      </div>
+
+      <form onsubmit="AuthController.saveDispatchSettings(event)" class="space-y-4 text-xs">
+        
+        <!-- SECTION 1: MSG91 OTP CONFIGURATION -->
+        <div class="border border-slate-200 rounded-2xl p-4 bg-white shadow-xs">
+          <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="smartphone" class="w-4 h-4 text-teal-600"></i>
+            <span class="font-bold text-slate-800 text-sm">1. Official MSG91 OTP Service</span>
+          </div>
+          <p class="text-[11px] text-slate-500 mb-3">Sends official SMS OTP to any entered Indian mobile number via MSG91.</p>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">MSG91 Auth Key (MSG91_AUTH_KEY)</label>
+              <input id="disp-msg91-auth-key" type="password" placeholder="Enter MSG91 Auth Key" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code" />
+              <p class="text-[10.5px] text-slate-400 mt-1">Get from MSG91 Dashboard → Settings / Authkey.</p>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">MSG91 OTP Template ID (MSG91_TEMPLATE_ID)</label>
+              <input id="disp-msg91-template-id" type="text" placeholder="e.g. 64a8b79c3f84e12..." class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code font-bold" />
+              <p class="text-[10.5px] text-slate-400 mt-1">Created in MSG91 Dashboard → OTP → Templates (e.g., "Your MediVault OTP is ##OTP##").</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: GMAIL SMTP -->
+        <div class="border border-slate-200 rounded-2xl p-4 bg-white shadow-xs">
+          <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="mail" class="w-4 h-4 text-red-600"></i>
+            <span class="font-bold text-slate-800 text-sm">2. Real Gmail Delivery (Google SMTP)</span>
+          </div>
+          <p class="text-[11px] text-slate-500 mb-3">Allows MediVault to send live OTP emails directly to your Gmail inbox for Doctor/Admin changes.</p>
+          
+          <div class="space-y-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Your Sender Gmail Address</label>
+              <input id="disp-gmail-user" type="email" placeholder="e.g. yourname@gmail.com" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code font-bold" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Google 16-Character App Password</label>
+              <input id="disp-gmail-pass" type="password" placeholder="e.g. abcd efgh ijkl mnop" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code tracking-wider" />
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 mt-2 text-[11px] text-amber-900">
+                <span class="font-bold block">How to get a free Google App Password (30 seconds):</span>
+                <ol class="list-decimal pl-4 space-y-0.5 mt-1 text-[10.5px] text-amber-800">
+                  <li>Visit <a href="https://myaccount.google.com/apppasswords" target="_blank" class="underline font-bold text-teal-800">myaccount.google.com/apppasswords</a></li>
+                  <li>Type App Name: <strong>MediVault</strong>, click <strong>Create</strong></li>
+                  <li>Copy the 16 letters and paste them here!</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- Test Gmail Button -->
+            <div class="pt-1 flex items-center gap-2">
+              <button type="button" onclick="AuthController.testGmailConnection()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] flex items-center gap-1.5 transition">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i> Test Send to My Gmail
+              </button>
+              <span id="test-email-status" class="text-[11px] font-medium text-slate-500 truncate"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="AuthController.closeDispatchSetupModal()" class="px-4 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl font-bold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold shadow-md shadow-teal-700/20 transition flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Save Settings
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: CHANGE CREDENTIALS VIA REAL GMAIL OTP (DOCTOR & ADMIN) -->
+  <!-- ========================================================== -->
+  <div id="change-credentials-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200">
+      
+      <button onclick="AuthController.closeChangeCredentialsModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-3">
+          <i data-lucide="key" class="w-6 h-6"></i>
+        </div>
+        <h3 id="change-cred-title" class="text-lg font-extrabold text-slate-900">Security: Change Username & Password</h3>
+        <p id="change-cred-sub" class="text-xs text-slate-500 mt-0.5">A real cryptographic OTP will be sent to your Gmail address to verify this change.</p>
+      </div>
+
+      <!-- STEP 1: FILL NEW DETAILS & REQUEST REAL GMAIL OTP -->
+      <div id="change-cred-step-1">
+        <form onsubmit="AuthController.handleRequestGmailOtpForCredentials(event)" class="space-y-3.5 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">New Username / Display Name *</label>
+            <input id="change-cred-new-name" type="text" placeholder="e.g. Dr. Rahul Sharma MD" 
+                   class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-semibold" required />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Your Gmail Address (Where OTP is Dispatched) *</label>
+            <input id="change-cred-gmail" type="email" placeholder="e.g. yourname@gmail.com" 
+                   class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code font-bold" required />
+            <p class="text-[10px] text-slate-400 mt-1">Real OTP will be sent via SMTP to this exact Gmail inbox.</p>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">New Security Password / Access Key *</label>
+            <input id="change-cred-new-pass" type="password" placeholder="Enter new password or key" 
+                   class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code" required />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Confirm New Password / Access Key *</label>
+            <input id="change-cred-confirm-pass" type="password" placeholder="Re-type new password or key" 
+                   class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-mono-code" required />
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md shadow-teal-700/20 transition flex items-center justify-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4"></i> Dispatch Real Security OTP to Gmail
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- STEP 2: ENTER RECEIVED GMAIL OTP -->
+      <div id="change-cred-step-2" class="hidden space-y-4 text-xs">
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+          <i data-lucide="mail-check" class="w-8 h-8 text-teal-600 mx-auto mb-1.5"></i>
+          <span class="block font-bold text-slate-900 text-sm">Check Your Gmail Inbox</span>
+          <p class="text-xs text-slate-500 mt-0.5">
+            A real security code was dispatched to <strong id="change-cred-target-gmail" class="text-slate-800 font-mono-code"></strong>
+          </p>
+        </div>
+
+        <div id="change-cred-preview-banner"></div>
+
+        <form onsubmit="AuthController.handleConfirmGmailOtp(event)" class="space-y-4">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 text-center">Enter 6-Digit Gmail OTP</label>
+            <input id="change-cred-otp-input" type="text" maxlength="6" placeholder="• • • • • •" 
+                   class="w-full text-center text-2xl font-mono-code font-black tracking-widest p-3 rounded-2xl border-2 border-teal-500 focus:ring-4 focus:ring-teal-500/20 text-teal-800" required />
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs shadow-md shadow-teal-700/20 transition flex items-center justify-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i> Verify OTP & Commit Changes
+          </button>
+
+          <div class="text-center pt-1">
+            <button type="button" onclick="document.getElementById('change-cred-step-2').classList.add('hidden'); document.getElementById('change-cred-step-1').classList.remove('hidden');" class="text-slate-500 hover:underline">
+              ← Change Email or Details
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- AI CHATBOT DRAWER (MEDIBOT HEALTH ASSISTANT) -->
+  <!-- ========================================================== -->
+  <div id="ai-chat-drawer" class="hidden fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] h-[540px] max-h-[80vh] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
+    <div class="p-4 bg-gradient-to-r from-teal-800 to-cyan-900 text-white flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-teal-500/30 flex items-center justify-center text-amber-300">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold leading-tight flex items-center gap-1.5">
+            MediBot AI Health Assistant
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          </h4>
+          <p class="text-[10px] text-teal-200">Clinical Co-Pilot & Health Guide</p>
+        </div>
+      </div>
+      <button onclick="AIChatController.toggleChat()" class="text-white/70 hover:text-white p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto bg-slate-50/60"></div>
+
+    <div class="p-3 bg-white border-t border-slate-100">
+      <form onsubmit="event.preventDefault(); AIChatController.sendMessage(document.getElementById('ai-chat-input').value)" class="flex items-center gap-2">
+        <input id="ai-chat-input" type="text" placeholder="Ask about lab results, medicines, allergies..." 
+               class="flex-1 text-xs p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-slate-50" />
+        <button type="submit" class="p-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl transition shrink-0">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </form>
+      <p class="text-[9px] text-slate-400 text-center mt-1">For informative guidance only • Consult medical practitioners for emergencies</p>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: SHARE RECORDS (PATIENT) -->
+  <!-- ========================================================== -->
+  <div id="share-records-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200">
+      <button onclick="PatientController.closeShareModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="key-round" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900">Authorize Doctor Access</h3>
+        <p class="text-xs text-slate-500 mt-1">Generate a temporary, time-bound cryptographic code or QR code for your clinician.</p>
+      </div>
+
+      <div class="space-y-3 mb-5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Access Scope</label>
+          <select id="share-scope" onchange="PatientController.generateFreshAccessCode()" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-teal-500 font-medium">
+            <option value="Full Medical History (Records, Rx, Consultations)">Full Medical History (Complete Record)</option>
+            <option value="Diagnostic Reports & Lab Tests Only">Diagnostic Reports & Lab Tests Only</option>
+            <option value="Prescriptions & Active Medications Only">Prescriptions & Active Medications Only</option>
+            <option value="Emergency Vitals & Allergies Only">Emergency Vitals & Allergies Only</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Access Duration</label>
+            <select id="share-duration" onchange="PatientController.generateFreshAccessCode()" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-teal-500 font-medium">
+              <option value="1">1 Hour (Quick Consult)</option>
+              <option value="24" selected>24 Hours (Day Visit)</option>
+              <option value="72">3 Days (Observation)</option>
+              <option value="168">7 Days (Full Care)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Authorized Doctor</label>
+            <input id="share-doctor-target" type="text" value="Dr. Rahul Sharma" onchange="PatientController.generateFreshAccessCode()" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-teal-500 font-medium" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center mb-5">
+        <span class="text-[11px] uppercase tracking-wider font-bold text-slate-400 block mb-1">Temporary Access Code</span>
+        <div class="flex items-center justify-center gap-3 my-2">
+          <span id="active-access-code-display" class="text-3xl font-black tracking-widest text-teal-700 font-mono-code bg-teal-100/60 px-4 py-1.5 rounded-xl border border-teal-200">
+            MV-9482
+          </span>
+          <button onclick="PatientController.copyAccessCode()" title="Copy Code" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-teal-500 text-slate-600 hover:text-teal-700 transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div class="mt-4 flex justify-center">
+          <div id="access-qr-container" class="p-3 bg-white rounded-xl shadow-sm border border-slate-200 inline-block"></div>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2 font-medium">The doctor can scan this QR code directly from their tablet or computer.</p>
+      </div>
+
+      <button onclick="PatientController.closeShareModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+        Done
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: UPLOAD MEDICAL RECORD (PATIENT) -->
+  <!-- ========================================================== -->
+  <div id="upload-record-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+      <button onclick="MediVaultApp.closeModal('upload-record-modal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="mb-5">
+        <h3 class="text-lg font-extrabold text-slate-900">Upload Medical Document</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Attach laboratory reports, radiology scans, or discharge summaries to your digital vault.</p>
+      </div>
+
+      <form onsubmit="PatientController.handleUploadRecord(event)" class="space-y-4 text-xs">
+        <div class="border-2 border-dashed border-teal-300 hover:border-teal-500 bg-teal-50/30 rounded-2xl p-6 text-center transition cursor-pointer relative">
+          <input id="up-file" type="file" accept=".pdf,.png,.jpg,.jpeg,.dcm" class="absolute inset-0 opacity-0 cursor-pointer" onchange="document.getElementById('file-upload-label').innerText = this.files[0] ? this.files[0].name : 'Choose file'" />
+          <i data-lucide="upload-cloud" class="w-8 h-8 text-teal-600 mx-auto mb-2"></i>
+          <span id="file-upload-label" class="block font-bold text-slate-800 text-xs">Drop PDF, JPEG, or DICOM here or browse</span>
+          <span class="text-[10px] text-slate-400 block mt-0.5">Max size 25 MB • AES-256 Client Encrypted</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-slate-700 mb-1">Document / Test Title *</label>
+            <input id="up-title" type="text" placeholder="e.g. Complete Blood Count (CBC) Panel" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 text-slate-800 font-medium" required />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Record Type *</label>
+            <select id="up-type" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-teal-500 font-medium">
+              <option value="Blood test">Blood test</option>
+              <option value="Urine test">Urine test</option>
+              <option value="X-ray">X-ray</option>
+              <option value="MRI">MRI</option>
+              <option value="CT scan">CT scan</option>
+              <option value="ECG">ECG</option>
+              <option value="Ultrasound">Ultrasound</option>
+              <option value="Scan reports">Scan reports</option>
+              <option value="Hospital discharge summaries">Hospital discharge summary</option>
+              <option value="Other medical documents">Other medical document</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Date of Test *</label>
+            <input id="up-date" type="date" value="2026-10-03" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-teal-500 font-medium" required />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Hospital / Laboratory *</label>
+            <input id="up-hospital" type="text" placeholder="e.g. ABC Diagnostics Lab" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 font-medium" required />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Attending Doctor / Radiologist *</label>
+            <input id="up-doctor" type="text" placeholder="e.g. Dr. Rahul Sharma" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 font-medium" required />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-slate-700 mb-1">Clinical Findings / Description</label>
+            <textarea id="up-desc" rows="2" placeholder="Brief summary of test impressions..." class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 font-medium"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-slate-700 mb-1">Tags (Comma-separated)</label>
+            <input id="up-tags" type="text" placeholder="Hematology, CBC, Routine" class="w-full p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 font-medium" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="MediVaultApp.closeModal('upload-record-modal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-bold">Cancel</button>
+          <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold shadow-md shadow-teal-700/20 transition flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i> Save to Vault
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: VIEW RECORD DETAILS -->
+  <!-- ========================================================== -->
+  <div id="view-record-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+      <div id="view-record-content"></div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: DIGITAL PRESCRIPTION PREVIEW -->
+  <!-- ========================================================== -->
+  <div id="preview-prescription-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200 max-h-[92vh] flex flex-col">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between no-print">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+          <h3 class="font-bold text-slate-900 text-sm">Official Digital Prescription Document</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="PrescriptionEngine.printPrescription()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print
+          </button>
+          <button onclick="PrescriptionEngine.downloadPrescriptionPDF()" class="px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download PDF
+          </button>
+          <button onclick="PrescriptionEngine.closePreviewModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 bg-slate-100/60">
+        <div id="prescription-print-area"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: DOCTOR QR CODE SCANNER -->
+  <!-- ========================================================== -->
+  <div id="doctor-qr-scanner-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-800 relative text-center">
+      <button onclick="DoctorController.closeQRScanner()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="mb-4">
+        <h3 class="text-base font-bold">Scan Patient QR Code</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Align the patient's MediVault QR code within the frame</p>
+      </div>
+
+      <div class="w-64 h-64 mx-auto rounded-2xl bg-black border-2 border-cyan-400/80 relative overflow-hidden flex items-center justify-center my-4">
+        <div class="scanner-laser"></div>
+        <div class="absolute inset-4 border border-dashed border-cyan-500/40 rounded-xl"></div>
+        <i data-lucide="qr-code" class="w-20 h-20 text-slate-700"></i>
+      </div>
+
+      <p class="text-[11px] text-slate-400 mb-4">Simulating camera viewfinder feed...</p>
+      <div class="space-y-2">
+        <button onclick="DoctorController.simulateQRScan('MV-9482')" class="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+          <i data-lucide="camera" class="w-4 h-4"></i> Simulate Successful Scan (Aarav Patel)
+        </button>
+        <button onclick="DoctorController.closeQRScanner()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl text-xs transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- MODAL: ACCESS DENIED SECURITY ALERT -->
+  <!-- ========================================================== -->
+  <div id="access-denied-modal" class="modal-backdrop hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-red-200 text-center relative">
+      <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="shield-x" class="w-7 h-7"></i>
+      </div>
+      <h3 class="text-lg font-extrabold text-slate-900">Access Denied</h3>
+      <p id="access-denied-reason" class="text-xs text-red-600 font-semibold bg-red-50 p-3 rounded-xl border border-red-200 my-3 leading-relaxed">
+        Patient consent record not found or authorization was revoked.
+      </p>
+      <p class="text-[11px] text-slate-500 mb-5 leading-normal">
+        Doctors cannot bypass patient consent controls. Please request the patient to generate a new active code from their dashboard.
+      </p>
+      <button onclick="DoctorController.closeAccessDeniedModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition">
+        Understand & Return
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ========================================================== -->
+  <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+  <!-- ========================================================== -->
+  <div id="toast-container" class="fixed bottom-5 left-5 z-50 space-y-2 max-w-md w-full px-4 pointer-events-none no-print"></div>
+
+
+  <!-- ========================================================== -->
+  <!-- FOOTER -->
+  <!-- ========================================================== -->
+  <footer class="bg-white border-t border-slate-200 py-6 px-4 lg:px-8 mt-12 text-center text-xs text-slate-400 no-print">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-teal-800">MediVault Health OS</span>
+        <span>• Centralized Medical Record & Prescription Management</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>Verified Telephony SMS & Real Gmail SMTP Active</span>
+        <span>• ABDM & HIPAA Architecture</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Script Pipeline -->
+  <script src="js/state.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/patient.js"></script>
+  <script src="js/doctor.js"></script>
+  <script src="js/prescription.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/ai-chat.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

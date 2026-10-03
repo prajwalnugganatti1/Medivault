@@ -1,0 +1,25 @@
+{
+  "name": "medivault",
+  "version": "1.0.0",
+  "description": "MediVault — Centralized Digital Medical Record and Prescription Management Platform Connecting Patients and Doctors with Consent Controls",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "healthcare",
+    "digital-health-records",
+    "ehr",
+    "patient-consent",
+    "digital-prescriptions",
+    "hackathon",
+    "abdm",
+    "hipaa"
+  ],
+  "author": "MediVault Team",
+  "license": "MIT",
+  "dependencies": {
+    "nodemailer": "^10.0.13"
+  }
+}

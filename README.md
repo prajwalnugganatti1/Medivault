@@ -1,187 +1,171 @@
-# 🍷 Wine Quality Classifier
+# MediVault 🩺🔒
+### Centralized Digital Medical Record, Consent & Prescription Platform
+#### With Multi-Role Authentication, Admin Control Console & MediBot AI
 
-[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-success?style=for-the-badge&logo=github)](https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.4%2B-orange?style=for-the-badge&logo=scikit-learn)](https://scikit-learn.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow?style=for-the-badge&logo=javascript)](https://developer.mozilla.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
-
-An intelligent, interactive machine learning web application that predicts wine quality ("Good" vs "Defective/Bad") from 11 objective physicochemical properties (pH, alcohol, volatile acidity, sulphates, sulfur dioxide, etc.).
-
-Designed to run **100% in the browser on GitHub Pages** with zero hosting costs, accompanied by a full Python Data Science & ML pipeline and an optional REST API.
+> **Hackathon 2026 Submission**  
+> *A patient-centric digital health record platform that follows the patient, connecting patients, doctors, and hospital administrators through cryptographic consent, verified doctor keys, digital prescriptions, and an AI clinical co-pilot.*
 
 ---
 
-## 📸 Overview & Key Features
+## 1. 📌 Key Innovations & Updates
 
-- 🧪 **Interactive Enology Lab**: Adjust 11 chemical compounds using real-time sliders and numeric inputs to see instant quality predictions.
-- ⚡ **Zero-Latency Client-Side Inference**: Pre-trained statistical decision ensemble embedded directly in JavaScript; no backend server required for hosting on **GitHub Pages**!
-- 🍷 **Red & White Varietal Support**: Separate trained models tailored to the distinct chemical profiles of Red and White wines.
-- 🕸️ **Chemical Fingerprint Radar Chart**: Real-time Chart.js radar visualization comparing the active sample against the benchmark "Good Wine" profile.
-- 📜 **AI Sommelier Sensory Notes**: Context-aware tasting notes explaining *why* a wine was classified as Good or Defective based on enological thresholds (e.g. vinegar defects, alcohol warmth, oxidation risk).
-- 📁 **Batch CSV Predictor**: Drag-and-drop CSV files with multiple wine samples to classify entire batches and export labeled results.
-- 🚀 **GitHub Pages CI/CD**: Automated `.github/workflows/deploy.yml` workflow to deploy on git push.
-- 🐍 **Full Python Machine Learning Pipeline**: Includes automated dataset fetching, Random Forest & Logistic Regression training, metric evaluation, and JSON weight export.
-
----
-
-## 🔬 The Science: 11 Chemical Properties
-
-Based on the landmark enological study by **Cortez et al. (2009)**:
-
-| Chemical Property | Unit | Typical Range | Enological Impact |
-| :--- | :--- | :--- | :--- |
-| **Volatile Acidity** | $g(acetic)/dm^3$ | 0.12 – 1.58 | **Primary defect indicator**. High levels ($>0.65$ in reds, $>0.45$ in whites) signal bacterial spoilage (*Acetobacter*) causing vinegar odor. |
-| **Alcohol** | $\%$ vol | 8.4 – 14.9 | **Strongest positive predictor**. Higher alcohol ($>11.5\%$) correlates with full body, flavor extraction, and perceived warmth. |
-| **Sulphates** | $g(K_2SO_4)/dm^3$ | 0.33 – 2.00 | Potassium sulphate acts as an antioxidant and antimicrobial preservative. |
-| **pH Level** | pH scale | 2.8 – 4.0 | Measures acidity equilibrium. Optimum wine range is 3.0 – 3.5. Above 3.7 wines taste flabby and spoil easily. |
-| **Citric Acid** | $g/dm^3$ | 0.0 – 1.0 | Imparts crispness and subtle citrus freshness to the palate. |
-| **Fixed Acidity** | $g(tartaric)/dm^3$ | 4.6 – 15.9 | Non-volatile acids that form the fundamental backbone and tartness of the wine. |
-| **Free $SO_2$** | $mg/dm^3$ | 1 – 72 | Active dissolved sulfur dioxide preventing oxidation and microbial growth. |
-| **Total $SO_2$** | $mg/dm^3$ | 6 – 289 | Total bound and free $SO_2$. Excessive amounts create pungent burnt-match odors. |
-| **Residual Sugar**| $g/dm^3$ | 0.6 – 15.5 | Natural grape sugars remaining after fermentation. |
-| **Density** | $g/cm^3$ | 0.990 – 1.003 | Correlates inversely with alcohol and directly with sugar concentration. |
-| **Chlorides** | $g(NaCl)/dm^3$ | 0.012 – 0.611 | Mineral salts; excessive concentrations impart an unpleasant briny taste. |
+In addition to centralized records, patient consent controls, and digital prescriptions, MediVault now includes:
+1. **Dedicated Pre-Login Authentication Portal:**
+   * **Separate Patient Portal:** Name, Phone, Gmail/Email, with an interactive **6-digit SMS/Email OTP verification flow** (60s timer, auto-fill demo). Supports both **Existing User (Login)** and **New User (Sign Up)**.
+   * **Separate Doctor Portal:** Doctor Name, Phone, Hospital Name, and an **Admin-Issued Special Doctor Access Key** (e.g., `DOC-KEY-8472`). Supports both **Existing Doctor (Login)** and **New Doctor Registration (Sign Up)**.
+2. **Super-Administrator Control Console:**
+   * **Doctor Key Provisioning:** Admin generates, tracks, and revokes special doctor access keys assigned to hospitals and physicians.
+   * **Patient & Doctor Oversight:** Manage registered citizens and clinical staff.
+   * **Platform Insights:** Diagnostic record distributions, consent grant metrics, and real-time security audit trails.
+3. **MediBot AI Healthcare Assistant:**
+   * **For Patients:** Plain-language lab report explanations (e.g. elevated WBC in CBC), medication schedules (when to take Metformin / Pantoprazole), diet guidance for gastritis, and consent tutorials.
+   * **For Doctors (Clinical Co-Pilot):** Critical allergy contraindication warnings (preventing beta-lactam prescriptions for Penicillin-allergic patients), drug dosage guidelines, and patient history summaries.
+4. **Complete Working Backend:**
+   * Zero-dependency Node.js server (`server.js`) & Python Flask server (`app.py`) with REST API endpoints for OTP dispatch, doctor key verification, admin key generation, and AI chat.
 
 ---
 
-## 📊 Model Performance & Benchmarks
-
-Models trained on **6,497** wine samples from the UCI Cortez et al. dataset:
-
-| Model | Varietal | Accuracy | ROC-AUC | F1-Score |
-| :--- | :--- | :---: | :---: | :---: |
-| **Random Forest** | Red Wine | **79.7%** | **0.887** | **0.96** |
-| **Random Forest** | White Wine | **83.3%** | **0.890** | **0.95** |
-| **Logistic Regression** | Red Wine | 74.1% | 0.824 | 0.76 |
-| **Logistic Regression** | White Wine | 74.1% | 0.791 | 0.75 |
-
-### Top Feature Importances (Random Forest):
-1. 🍇 **Alcohol**: ~18.5%
-2. 🛡️ **Sulphates**: ~14.1%
-3. 🧪 **Volatile Acidity**: ~11.5%
-4. 💨 **Total Sulfur Dioxide**: ~10.0%
-5. ⚖️ **Density**: ~9.1%
-
----
-
-## 🗂️ Project Structure
+## 2. 👥 Three Distinguishing Roles & Portals
 
 ```
-├── .github/
-│   └── workflows/
-│       └── deploy.yml          # GitHub Actions auto-deploy to GitHub Pages
-├── css/
-│   └── styles.css              # Winery / Sommelier UI theme & animations
-├── js/
-│   ├── app.js                  # Main UI controller & two-way slider bindings
-│   ├── model.js                # Client-side ML inference engine (exact weights)
-│   ├── charts.js               # Chart.js radar & SVG circular gauge controller
-│   └── batch.js                # Batch CSV drag-and-drop parser & exporter
-├── model/
-│   ├── train.py                # Dataset download, training & JSON weight export
-│   ├── evaluate.py             # Metrics, confusion matrix, ROC-AUC validation
-│   ├── wine_model.json         # Exported model weights & benchmarks
-│   ├── wine_red_rf.joblib      # Serialized Red wine Random Forest
-│   ├── wine_white_rf.joblib    # Serialized White wine Random Forest
-│   └── data/
-│       ├── winequality-red.csv
-│       └── winequality-white.csv
-├── app.py                      # Optional Python REST API & local web server
-├── index.html                  # Interactive Single-Page Application
-├── sample_wines.csv            # Demo CSV with mixed wines for batch testing
-├── requirements.txt            # Python dependencies
-├── .gitignore                  # Git ignore rules
-├── LICENSE                     # MIT License
-└── README.md                   # Project documentation
+                      [ MediVault Auth Portal ]
+                                  │
+         ┌────────────────────────┼────────────────────────┐
+         ▼                        ▼                        ▼
+  🧑 PATIENT PORTAL        🩺 DOCTOR PORTAL        🛡️ ADMIN CONSOLE
+  • Name, Phone, Gmail     • Name, Phone, Hospital  • Admin Email & Master Key
+  • 6-digit OTP Verify     • Special Doctor Key     • Generate Doctor Keys
+  • Login / Sign Up        • Login / Sign Up        • Patient / Doctor Audits
+         │                        │                        │
+         ▼                        ▼                        ▼
+ [ Patient Dashboard ]    [ Doctor Gateway ]      [ Admin Control Console ]
+ • Medical Records        • Verify Patient QR      • Key Registry (Active/Revoked)
+ • Share QR / Code        • Allergy Warnings       • Diagnostic Analytics
+ • Digital Rx Vault       • Digital Rx Studio      • Consent Audit Trail
+         │                        │
+         └────────────┬───────────┘
+                      ▼
+             🤖 MEDIBOT AI ASSISTANT
+             (Patient & Doctor Co-Pilot)
 ```
 
 ---
 
-## 🚀 Getting Started
+## 3. 🔐 Authentication & Security Workflows
 
-### Option 1: Quick Run in Browser (No Installation)
-Simply double-click `index.html` in any web browser, or launch a simple local server:
+### 🧑 Patient Authentication (OTP-Verified)
+1. **Existing User (Login):**
+   * Patient enters Name, Phone number, and Gmail/Email.
+   * System generates a cryptographic **6-digit OTP** (e.g. `597745`).
+   * Patient enters the OTP within the 60-second window to unlock their vault.
+2. **New User (Sign Up):**
+   * Collects Name, Phone, Gmail, Age, Gender, Blood Group, and Allergies.
+   * Dispatches OTP, assigns a unique Patient ID (`MV-XXXXX`), stores the profile, and logs in.
+3. **1-Click Quick Demo:** Click *"1-Click Demo Login as Aarav Patel"* to instantly test without typing.
+
+### 🩺 Doctor Authentication (Admin-Issued Special Key)
+1. **Existing Doctor (Login):**
+   * Doctor enters Name, Phone, Hospital Name, and their **Special Doctor Access Key** (e.g. `DOC-KEY-8472`).
+   * System verifies that the key exists and is `active` in the Admin Registry.
+2. **New Doctor (Sign Up):**
+   * Doctor provides Name, Phone, Hospital, Specialization, Medical Reg Number, and an unassigned Admin License Key (e.g. `DOC-KEY-9941`).
+   * Validates key, binds doctor to the hospital, and grants clinical privileges.
+3. **1-Click Quick Demo:** Click *"1-Click Demo Login as Dr. Rahul Sharma"* for immediate verification.
+
+### 🛡️ Administrator Portal (Super-Admin Control)
+* Admin signs in with `admin@medivault.health` and Master Key `ADMIN-MASTER-2026`.
+* Has full authority to generate new Doctor Keys, revoke compromised keys, and inspect patient/doctor records.
+
+---
+
+## 4. 🤖 MediBot AI Assistant
+
+Click the floating **MediBot AI Assistant** button in the bottom right corner (or in the header) to interact with the role-aware clinical co-pilot:
+
+* **Patient Queries:**
+  * *"What does elevated WBC in my CBC report mean?"*
+  * *"When should I take Metformin and Pantoprazole?"*
+  * *"How do I share my records with Dr. Rahul Sharma?"*
+* **Doctor Queries:**
+  * *"Check drug interaction for patient with Penicillin allergy"* ➔ Alerts the clinician that Aarav Patel has a documented Penicillin allergy and warns against prescribing Amoxicillin/Augmentin!
+  * *"Recommended dosage schedule for Azithromycin"*
+  * *"Summarize Aarav Patel's lab results & vitals"*
+
+---
+
+## 5. 🚀 How to Run the Application
+
+The web server is already active on your local machine:
+
+### Option A: Node.js (Active on Port 3000)
 ```bash
-python -m http.server 8000
+node server.js
+# Or:
+npm start
 ```
-Open `http://localhost:8000` to interact with the classifier.
+Open **`http://localhost:3000`** in your browser.
 
----
-
-### Option 2: Run Python REST API & Server
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/wine-quality-classifier.git
-   cd wine-quality-classifier
-   ```
-
-2. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Start the server:
-   ```bash
-   python app.py
-   ```
-   Navigate to `http://localhost:8000` to access the web UI or test the endpoints:
-   - **Health Check**: `GET /api/health`
-   - **Predict**: `POST /api/predict`
-   - **Batch**: `POST /api/batch`
-
----
-
-### Option 3: Retrain the Machine Learning Models
-To fetch fresh data from UCI and re-train the models:
+### Option B: Python Flask (Alternative on Port 5000)
 ```bash
-python model/train.py
+python app.py
 ```
-To view detailed confusion matrices and classification reports:
-```bash
-python model/evaluate.py
-```
+Open **`http://localhost:5000`** in your browser.
+
+### Option C: Direct Browser Opening
+Open `index.html` directly in any web browser.
 
 ---
 
-## 🌐 Deploying to GitHub Pages (1-Click)
+## 6. 🎬 4-Minute Hackathon Demo Script for Judges
 
-1. Push this repository to GitHub:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Wine Quality Classifier web application"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-   git push -u origin main
-   ```
-
-2. On your GitHub repository page:
-   - Go to **Settings** > **Pages**.
-   - Under **Build and deployment**, select **GitHub Actions** as the source.
-   - The included `.github/workflows/deploy.yml` will automatically build and publish the website to `https://<YOUR_USERNAME>.github.io/<YOUR_REPO_NAME>/`!
+1. **Step 1: Pre-Login Authentication & OTP Verification**
+   * Visit `http://localhost:3000`. You will see the **Pre-Login Screen**.
+   * On the **Patient** tab, click *Request Security OTP*.
+   * Notice the **6-digit OTP modal** with countdown timer and auto-fill feature.
+   * Click *Verify & Unlock Vault* (or use the *1-Click Demo Login as Aarav Patel*).
+2. **Step 2: Patient Health Dashboard & Records**
+   * Review Aarav Patel's health summary, blood group (`O+`), and emergency contacts.
+   * Go to *Medical Records*. Filter by *Blood Tests* and click *View Details* on the CBC panel.
+3. **Step 3: Patient Consent & QR Code Generation**
+   * Click **Share Records**.
+   * Note the temporary **6-digit code** (`MV-9482`) and the live **QR code**.
+   * Show the *Access Audit Trail* with status badges and the **Revoke Access** trigger.
+4. **Step 4: Logout & Doctor Login via Special Key**
+   * Click the **Logout** icon in the header.
+   * Switch to the **Doctor** tab on the login screen.
+   * Notice the **Special Doctor Access Key** field (`DOC-KEY-8472`).
+   * Click *Validate Key & Enter Doctor Portal*.
+5. **Step 5: Doctor Gateway & Patient View**
+   * In the Doctor Portal, enter code `MV-9482` (or click *Valid Code MV-9482*).
+   * Review the patient's record and point out the prominent **CRITICAL ALLERGIES ALERT** in red (*Penicillin, Sulfa Drugs*).
+6. **Step 6: Digital Prescription Studio & PDF Export**
+   * In the *New Consultation & Digital Rx* tab, add diagnosis and click quick-add medication pills (*Paracetamol, Azithromycin*).
+   * Click *Save & Issue Digital Prescription*.
+   * Show the official clinic letterhead Rx and click **Download PDF**.
+7. **Step 7: Super-Admin Control Console**
+   * Switch role or log in as **Admin** (`admin@medivault.health` / `ADMIN-MASTER-2026`).
+   * Go to **Doctor Special Keys**. Fill in a hospital name and click **Generate & Issue Special Doctor Key**.
+   * Note the newly issued key (`DOC-KEY-XXXX`). Show the **Revoke Key** button.
+   * Inspect **Patients Oversight**, **Doctors Registry**, and **Platform Insights**.
+8. **Step 8: MediBot AI Assistant**
+   * Click the bottom-right floating **MediBot AI** button.
+   * Click *"Check drug interaction for patient with Penicillin allergy"* to demonstrate the AI co-pilot catching the contraindication!
 
 ---
 
-## 📜 Academic Citation
+## 7. 📄 REST API Endpoints
 
-If you use this work or dataset, please cite the original authors:
-
-```bibtex
-@article{cortez2009modeling,
-  title={Modeling wine preferences by data mining from physicochemical properties},
-  author={Cortez, Paulo and Cerdeira, Ant{\'o}nio and Almeida, Fernando and Matos, Telmo and Reis, Jos{\'e}},
-  journal={Decision Support Systems},
-  volume={47},
-  number={4},
-  pages={547--553},
-  year={2009},
-  publisher={Elsevier}
-}
-```
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/health` | Health status and version check |
+| `POST` | `/api/auth/patient/request-otp` | Generates and sends 6-digit OTP |
+| `POST` | `/api/auth/patient/verify-otp` | Verifies OTP code and unlocks session |
+| `POST` | `/api/auth/doctor/verify-key` | Validates Doctor Key against Admin registry |
+| `POST` | `/api/admin/keys/generate` | Issues a new Doctor Special Key |
+| `GET` | `/api/admin/insights` | Fetches platform analytics and metrics |
+| `POST` | `/api/ai/chat` | AI chatbot processing endpoint |
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+## 8. 📄 License
+MIT License. Created for Hackathon 2026.
