@@ -996,6 +996,41 @@ class MediVaultStore {
     this.state.notifications.forEach(n => n.read = true);
     this.saveState();
   }
+
+  // ----------------------------------------------------
+  // Doctor Appointments
+  // ----------------------------------------------------
+  getDoctors() {
+    return [...(this.state.registeredDoctors || [])];
+  }
+
+  getAppointments() {
+    if (!Array.isArray(this.state.appointments)) this.state.appointments = [];
+    return [...this.state.appointments].sort(
+      (a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)
+    );
+  }
+
+  addAppointment(appt) {
+    if (!Array.isArray(this.state.appointments)) this.state.appointments = [];
+    const newAppt = {
+      id: 'APT-' + Math.floor(10000 + Math.random() * 90000),
+      status: 'Confirmed',
+      createdAt: new Date().toISOString(),
+      ...appt
+    };
+    this.state.appointments.push(newAppt);
+    this.saveState();
+    return newAppt;
+  }
+
+  cancelAppointment(id) {
+    const appt = (this.state.appointments || []).find(a => a.id === id);
+    if (!appt) return false;
+    appt.status = 'Cancelled';
+    this.saveState();
+    return true;
+  }
 }
 
 window.mediStore = new MediVaultStore();

@@ -218,7 +218,7 @@ const MediVaultApp = {
     this.currentView = viewId;
 
     // Patient Views
-    const pViews = ['patient-dashboard', 'patient-records', 'patient-prescriptions', 'patient-access', 'patient-profile', 'patient-timeline'];
+    const pViews = ['patient-dashboard', 'patient-records', 'patient-prescriptions', 'patient-access', 'patient-profile', 'patient-timeline', 'patient-appointments'];
     pViews.forEach(v => {
       const el = document.getElementById(`view-${v}`);
       const navBtn = document.getElementById(`nav-link-${v}`);
@@ -261,6 +261,7 @@ const MediVaultApp = {
     if (viewId === 'patient-records' && window.PatientController) window.PatientController.renderRecords();
     if (viewId === 'patient-access' && window.PatientController) window.PatientController.renderAccessHistory();
     if (viewId === 'patient-timeline' && window.PatientController) window.PatientController.renderTimeline();
+    if (viewId === 'patient-appointments' && window.AppointmentController) window.AppointmentController.render();
     if (viewId === 'doctor-dashboard' && window.DoctorController) window.DoctorController.renderDashboard();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
