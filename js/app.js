@@ -21,7 +21,7 @@ const MediVaultApp = {
     // Check user session
     const currentUser = window.mediStore.getCurrentUser();
     if (!currentUser) {
-      this.showAuthScreen();
+      this.enterPortal('patient');
     } else {
       this.completeLogin(currentUser);
     }
@@ -75,6 +75,9 @@ const MediVaultApp = {
     this.currentRole = user.role;
     this.applyRole(user.role);
 
+    const portalSwitcher = document.getElementById('portal-switcher');
+    if (portalSwitcher) portalSwitcher.value = user.role;
+
     // Update Header demographics
     const headerName = document.getElementById('header-user-name');
     const headerSub = document.getElementById('header-user-sub');
@@ -105,10 +108,48 @@ const MediVaultApp = {
     if (window.lucide) window.lucide.createIcons();
   },
 
+  enterPortal(role) {
+    const state = window.mediStore.state;
+    let sessionUser;
+
+    if (role === 'doctor') {
+      const doctor = state.registeredDoctors[0];
+      sessionUser = {
+        role: 'doctor',
+        id: doctor.id,
+        name: doctor.name,
+        email: doctor.email,
+        phone: doctor.phone,
+        hospital: doctor.hospital,
+        specialization: doctor.specialization,
+        data: doctor
+      };
+    } else if (role === 'admin') {
+      sessionUser = {
+        role: 'admin',
+        id: state.admin.id,
+        name: state.admin.name,
+        email: state.admin.email,
+        data: state.admin
+      };
+    } else {
+      const patient = state.registeredPatients[0];
+      sessionUser = {
+        role: 'patient',
+        id: patient.id,
+        name: patient.fullName,
+        email: patient.email,
+        phone: patient.phone,
+        data: patient
+      };
+    }
+
+    window.mediStore.setCurrentUser(sessionUser);
+    this.completeLogin(sessionUser);
+  },
+
   logout() {
-    window.mediStore.logout();
-    this.showToast('You have been logged out of MediVault.', 'info');
-    this.showAuthScreen();
+    this.enterPortal('patient');
   },
 
   // ----------------------------------------------------
